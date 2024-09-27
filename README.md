@@ -65,3 +65,9 @@ Tracking issues to be added:
 ## Q&A
 
 * Should `transferToImmutable` support a `newByteLength` argument?
+* Should trying to write data in an immutable ArrayBuffer via a TypedArray element set throw, even though trying to write out-of-bounds or to a detached ArrayBuffer does not?
+* Should TypedArray write methods (`copyWithin`, `fill`, `reverse`, `set`, etc.) throw when their backing ArrayBuffer is immutable but the targeted range is zero-length? If so, how early or late in the algorithm? The methods currently inspect arguments after ValidateTypedArray.
+* Similarly,
+  * How early or late in SetViewValue against an immutable ArrayBuffer should an exception be thrown? It currently inspects arguments *before* IsViewOutOfBounds.
+  * Likewise for abstract operations such as ArrayBufferCopyAndDetach (which currently checks IsSharedArrayBuffer, then _newLength_, then IsDetachedBuffer).
+  * And also for `Atomics` functions.
