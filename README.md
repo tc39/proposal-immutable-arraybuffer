@@ -8,7 +8,7 @@ A TC39 proposal for immutable ArrayBuffers.
 
 **Stage**: 0
 
-**Champion**: Mark S. Miller (@erights)
+**Champion**: Mark S. Miller (@erights), Peter Hoddie (@phoddie)
 
 **Specification**: https://papers.agoric.com/tc39-proposal-immutable-arraybuffer/
 
