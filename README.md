@@ -71,6 +71,16 @@ Tracking issues to be added:
 <dl>
 <dt>
 
+Why can't an immutable ArrayBuffer be detached/transferred?
+
+</dt>
+<dd>
+
+Because that would result in observable changes to any TypedArray or DataView backed by it.
+
+</dd>
+<dt>
+
 Should `transferToImmutable` support a `newByteLength` argument?
 
 </dt>
