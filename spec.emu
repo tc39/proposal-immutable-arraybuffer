@@ -20,6 +20,83 @@ contributors: Mark S. Miller, Richard Gibson
     <emu-clause id="sec-typedarray-exotic-objects" oldids="sec-integer-indexed-exotic-objects" number="5">
       <h1>TypedArray Exotic Objects</h1>
 
+      <emu-clause id="sec-typedarray-getownproperty" oldids="sec-integer-indexed-exotic-objects-getownproperty-p" type="internal method" number="1">
+        <h1>
+          [[GetOwnProperty]] (
+            _P_: a property key,
+          ): a normal completion containing either a Property Descriptor or *undefined*
+        </h1>
+        <dl class="header">
+          <dt>for</dt>
+          <dd>a TypedArray _O_</dd>
+        </dl>
+        <emu-alg>
+          1. If _P_ is a String, then
+            1. Let _numericIndex_ be CanonicalNumericIndexString(_P_).
+            1. If _numericIndex_ is not *undefined*, then
+              1. Let _value_ be TypedArrayGetElement(_O_, _numericIndex_).
+              1. If _value_ is *undefined*, return *undefined*.
+              1. <ins>Let _mutable_ be *true*.</ins>
+              1. <ins>If IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, set _mutable_ to *false*.</ins>
+              1. Return the PropertyDescriptor { [[Value]]: _value_, [[Writable]]: <del>*true*</del> <ins>_mutable_</ins>, [[Enumerable]]: *true*, [[Configurable]]: <del>*true*</del> <ins>_mutable_</ins> }.
+          1. Return OrdinaryGetOwnProperty(_O_, _P_).
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-typedarray-defineownproperty" oldids="sec-integer-indexed-exotic-objects-defineownproperty-p-desc" type="internal method" number="3">
+        <h1>
+          [[DefineOwnProperty]] (
+            _P_: a property key,
+            _Desc_: a Property Descriptor,
+          ): either a normal completion containing a Boolean or a throw completion
+        </h1>
+        <dl class="header">
+          <dt>for</dt>
+          <dd>a TypedArray _O_</dd>
+        </dl>
+        <emu-alg>
+          1. If _P_ is a String, then
+            1. Let _numericIndex_ be CanonicalNumericIndexString(_P_).
+            1. If _numericIndex_ is not *undefined*, then
+              1. If IsValidIntegerIndex(_O_, _numericIndex_) is *false*, return *false*.
+              1. <ins>Let _mutable_ be *true*.</ins>
+              1. <ins>If IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, set _mutable_ to *false*.</ins>
+              1. If _Desc_ has a [[Configurable]] field and _Desc_.[[Configurable]] is <del>*false*</del> <ins>not _mutable_</ins>, return *false*.
+              1. If _Desc_ has an [[Enumerable]] field and _Desc_.[[Enumerable]] is *false*, return *false*.
+              1. If IsAccessorDescriptor(_Desc_) is *true*, return *false*.
+              1. If _Desc_ has a [[Writable]] field and _Desc_.[[Writable]] is <del>*false*</del> <ins>not _mutable_</ins>, return *false*.
+              1. <ins>If _Desc_ has a [[Value]] field and _mutable_ is *false* and SameValue(_Desc_.[[Value]], TypedArrayGetElement(_O_, _numericIndex_)) is *false*, return *false*.</ins>
+              1. If _Desc_ has a [[Value]] field <ins>and _mutable_ is *true*</ins>, perform ? TypedArraySetElement(_O_, _numericIndex_, _Desc_.[[Value]]).
+              1. Return *true*.
+          1. Return ! OrdinaryDefineOwnProperty(_O_, _P_, _Desc_).
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-typedarray-set" oldids="sec-integer-indexed-exotic-objects-set-p-v-receiver" type="internal method" number="5">
+        <h1>
+          [[Set]] (
+            _P_: a property key,
+            _V_: an ECMAScript language value,
+            _Receiver_: an ECMAScript language value,
+          ): either a normal completion containing a Boolean or a throw completion
+        </h1>
+        <dl class="header">
+          <dt>for</dt>
+          <dd>a TypedArray _O_</dd>
+        </dl>
+        <emu-alg>
+          1. If _P_ is a String, then
+            1. Let _numericIndex_ be CanonicalNumericIndexString(_P_).
+            1. If _numericIndex_ is not *undefined*, then
+              1. If SameValue(_O_, _Receiver_) is *true*, then
+                1. <ins>IsValidIntegerIndex(_O_, _numericIndex_) is *true* and IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, return *false*.</ins>
+                1. Perform ? TypedArraySetElement(_O_, _numericIndex_, _V_).
+                1. Return *true*.
+              1. If IsValidIntegerIndex(_O_, _numericIndex_) is *false*, return *true*.
+          1. Return ? OrdinarySet(_O_, _P_, _V_, _Receiver_).
+        </emu-alg>
+      </emu-clause>
+
       <emu-clause id="sec-typedarraysetelement" oldids="sec-integerindexedelementset" type="abstract operation" number="16">
         <h1>
           TypedArraySetElement (
