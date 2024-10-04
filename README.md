@@ -91,6 +91,16 @@ Should trying to write data in an immutable ArrayBuffer via a TypedArray element
 </dt>
 <dt>
 
+Should the index properties of a TypedArray backed by an immutable ArrayBuffer be configurable and writable?
+
+</dt>
+<dd>
+
+No, TypedArray index properties should continue to track the state of the underlying buffer without individual bookkeeping.
+
+</dd>
+<dt>
+
 Should TypedArray write methods (`copyWithin`, `fill`, `reverse`, `set`, etc.) throw when their backing ArrayBuffer is immutable but the targeted range is zero-length? If so, how early or late in the algorithm? The methods currently inspect arguments after ValidateTypedArray.
 
 </dt>
