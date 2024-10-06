@@ -62,15 +62,18 @@ const data = Uint8Array.fromBase64(inputBase64);
 const dataLen = data.length;
 const dataLenStr = String(dataLen);
 const digitCount = dataLenStr.length;
+
 // Transfer to a new ArrayBuffer with room for the netstring framing.
 const tmpBuf = data.buffer.transfer(digitCount + 1 + dataLen + 1);
 const tmpArr = new Uint8Array(tmpBuf);
 assert(tmpArr.buffer === tmpBuf);
+
 // Frame the data.
 tmpArr.copyWithin(digitCount + 1, 0);
 for (let i = 0; i < digitCount; i++) tmpArr[i] = dataLenStr.charCodeAt(i);
 tmpArr[digitCount] = 0x3A;
 tmpArr[tmpArr.length - 1] = 0x2C;
+
 // Transfer to an immutable ArrayBuffer backing a frozen Uint8Array.
 const netstringArr = Object.freeze(new Uint8Array(tmpBuf.transferToImmutable()));
 assert(tmpBuf.detached);
