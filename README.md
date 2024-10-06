@@ -57,26 +57,31 @@ The ArrayBuffer `slice` method and TypedArray methods that create new ArrayBuffe
 ### Represent arbitrary binary data as an immutable [netstring](https://en.wikipedia.org/wiki/Netstring)
 
 ```js
-// Read data from base64 input and calculate its length.
-const data = Uint8Array.fromBase64(inputBase64);
-const dataLen = data.length;
-const dataLenStr = String(dataLen);
-const digitCount = dataLenStr.length;
+const consumeIntoNetstring = data => {
+  // Transfer to a new ArrayBuffer with room for the netstring framing.
+  // https://en.wikipedia.org/wiki/Netstring
+  const prefix = new TextEncoder().encode(`${data.length}:`);
+  const buf = data.buffer.transfer(prefix.length + data.length + 1);
 
-// Transfer to a new ArrayBuffer with room for the netstring framing.
-const tmpBuf = data.buffer.transfer(digitCount + 1 + dataLen + 1);
-const tmpArr = new Uint8Array(tmpBuf);
-assert(tmpArr.buffer === tmpBuf);
+  // Frame the data.
+  const tmpArr = new Uint8Array(buf);
+  tmpArr.copyWithin(prefix.length, 0);
+  tmpArr.set(prefix);
+  tmpArr[tmpArr.length - 1] = 0x2C;
 
-// Frame the data.
-tmpArr.copyWithin(digitCount + 1, 0);
-for (let i = 0; i < digitCount; i++) tmpArr[i] = dataLenStr.charCodeAt(i);
-tmpArr[digitCount] = 0x3A;
-tmpArr[tmpArr.length - 1] = 0x2C;
+  // Transfer to an immutable ArrayBuffer backing a frozen Uint8Array.
+  const frozenNetstring = Object.freeze(new Uint8Array(buf.transferToImmutable()));
+  assert(buf.detached);
+  return frozenNetstring;
+};
 
-// Transfer to an immutable ArrayBuffer backing a frozen Uint8Array.
-const netstringArr = Object.freeze(new Uint8Array(tmpBuf.transferToImmutable()));
-assert(tmpBuf.detached);
+const input = new TextEncoder().encode('hello world!');
+const result = consumeIntoNetstring(input);
+assert(Object.isFrozen(result));
+try { result[0] = 0; } catch (_err) {}
+try { new Uint8Array(result.buffer)[0] = 1; } catch (_err) {}
+try { result.buffer.transferToImmutable(); } catch (_err) {}
+assert(String.fromCharCode(...result) === '12:hello world!,');
 ```
 
 ## Implementations
