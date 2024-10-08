@@ -8,7 +8,11 @@ A TC39 proposal for immutable ArrayBuffers.
 
 **Stage**: 0
 
-**Champion**: Mark S. Miller (@erights), Peter Hoddie (@phoddie), Richard Gibson (@gibson042)
+**Champions**: 
+- Mark S. Miller (@erights)
+- Peter Hoddie (@phoddie)
+- Richard Gibson (@gibson042)
+- Jack-Works (@Jack-Works)
 
 **Specification**: https://papers.agoric.com/tc39-proposal-immutable-arraybuffer/
 
@@ -39,6 +43,10 @@ Some JavaScript implementations, like Moddable XS, bring JavaScript to embedded 
 APIs that accept ArrayBuffers and/or objects backed by them could also benefit from performance improvement by avoiding defensive copies when the input buffers are immutable (see [Generic zero-copy ArrayBuffer usage](https://gist.github.com/domenic/a9343fa787ba54b4ba3a60882c49cc32) for a proposed alternative solution to this problem in the Web Platform).
 
 The [OCapN](https://ocapn.org/) network protocol treats strings and byte-arrays as distinct forms of bulk data to be transmitted by copy. At JavaScript endpoints speaking OCapN such as [@endo/pass-style](https://www.npmjs.com/package/@endo/pass-style) + [@endo/marshal](https://www.npmjs.com/package/@endo/marshal), JavaScript strings represent OCapN strings. The immutability of strings in the JavaScript language reflects their by-copy nature in the protocol. Likewise, to reflect an OCapN byte-array well into the JavaScript language, an immutable container of bulk binary data is required. There currently are none, but an Immutable `ArrayBuffer` would provide exactly the necessary low-level machinery.
+
+## Prior proposals with overlapping goals
+
+[Limited ArrayBuffer](https://github.com/tc39/proposal-limited-arraybuffer)
 
 ## Solution
 
