@@ -18,6 +18,8 @@ A TC39 proposal for immutable ArrayBuffers.
 
 ## Presentation history
 
+[Oct 2024 tc39 Slides Keynote](https://github.com/Agoric/tc39-proposal-immutable-arraybuffer/blob/main/immu-arrayBuffers.key) [pdf]([Oct 2024 tc39 Slides pdf](https://github.com/Agoric/tc39-proposal-immutable-arraybuffer/blob/main/immu-arrayBuffers.pdf)
+
 ## Background
 
 Prior proposals [In-Place Resizable and Growable `ArrayBuffer`s](https://github.com/tc39/proposal-resizablearraybuffer) and [ArrayBuffer.prototype.transfer and friends](https://github.com/tc39/proposal-arraybuffer-transfer) have both reached stage 4, and so are now an official part of JavaScript. Altogether, `ArrayBuffer.prototype` now has the following methods:
