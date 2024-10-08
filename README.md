@@ -18,7 +18,7 @@ A TC39 proposal for immutable ArrayBuffers.
 
 ## Presentation history
 
-[Oct 2024 tc39 Slides Keynote](https://github.com/Agoric/tc39-proposal-immutable-arraybuffer/blob/main/immu-arrayBuffers.key) [pdf]([Oct 2024 tc39 Slides pdf](https://github.com/Agoric/tc39-proposal-immutable-arraybuffer/blob/main/immu-arrayBuffers.pdf)
+[Oct 2024 tc39 Slides Keynote](https://github.com/Agoric/tc39-proposal-immutable-arraybuffer/blob/main/immu-arrayBuffers.key) [pdf](https://github.com/Agoric/tc39-proposal-immutable-arraybuffer/blob/main/immu-arrayBuffers.pdf)
 
 ## Background
 
