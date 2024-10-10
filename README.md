@@ -111,41 +111,54 @@ Tracking issues to be added:
 ## Q&A
 
 <dl>
-<dt>
+<!-- Markdown rendering of HTML blocks requires a blank line before further Markdown content. -->
 
+
+<dt>
 Why can't an immutable ArrayBuffer be detached/transferred?
-
 </dt>
 <dd>
-
 Because that would result in observable changes to any TypedArray or DataView backed by it.
-
 </dd>
+
+
 <dt>
-
-Should `transferToImmutable` support a `newByteLength` argument?
-
-</dt>
-<dt>
-
-Should trying to write data in an immutable ArrayBuffer via a TypedArray element set throw, even though trying to write out-of-bounds or to a detached ArrayBuffer does not?
-
-</dt>
-<dt>
-
 Should the index properties of a TypedArray backed by an immutable ArrayBuffer be configurable and writable?
-
 </dt>
 <dd>
-
 No, TypedArray index properties should continue to track the state of the underlying buffer without individual bookkeeping.
-
 </dd>
+
+
+<dt>
+
+Should `transferToImmutable` support a _newByteLength_ argument?
+</dt>
+<dd>
+It might be useful for truncation, but probably rarely for expansion because the output would have an all-zeroes suffix that could not be changed.
+</dd>
+
+
+<dt>
+
+Should ArrayBuffers support zero-copy slices (e.g., `arrayBuffer.sliceToImmutable()`)?
+</dt>
+<dd>
+https://github.com/tc39/proposal-immutable-arraybuffer/issues/9
+</dd>
+
+
+<dt>
+Should trying to write data in an immutable ArrayBuffer via a TypedArray element set throw, even though trying to write out-of-bounds or to a detached ArrayBuffer does not?
+</dt>
+
+
 <dt>
 
 Should TypedArray write methods (`copyWithin`, `fill`, `reverse`, `set`, etc.) throw when their backing ArrayBuffer is immutable but the targeted range is zero-length? If so, how early or late in the algorithm? The methods currently inspect arguments after ValidateTypedArray.
-
 </dt>
+
+
 <dt>
 
 Similarly,
@@ -154,4 +167,6 @@ Similarly,
 * And also for `Atomics` functions.
 
 </dt>
+
+
 <dl>
