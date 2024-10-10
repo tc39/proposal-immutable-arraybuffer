@@ -7,7 +7,7 @@
 title: Immutable ArrayBuffers
 status: proposal
 stage: 0
-shortname: &lt;a href="https://github.com/Agoric/tc39-proposal-immutable-arraybuffer"&gt;proposal-immutable-arraybuffer&lt;/a&gt;
+shortname: &lt;a href="https://github.com/tc39/tc39-proposal-immutable-arraybuffer"&gt;proposal-immutable-arraybuffer&lt;/a&gt;
 contributors: Mark S. Miller, Richard Gibson
 </pre>
 
