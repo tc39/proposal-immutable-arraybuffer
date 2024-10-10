@@ -14,11 +14,11 @@ A TC39 proposal for immutable ArrayBuffers.
 - Richard Gibson (@gibson042)
 - Jack-Works (@Jack-Works)
 
-**Specification**: https://tc39.es/tc39-proposal-immutable-arraybuffer/
+**Specification**: https://tc39.es/proposal-immutable-arraybuffer/
 
 ## Presentation history
 
-- October 2024 ([slides.key](https://github.com/tc39/tc39-proposal-immutable-arraybuffer/blob/d4fac6c6602c5fa5a1d3769242f042758dc43db6/immu-arrayBuffers.key), [slides.pdf](https://github.com/tc39/tc39-proposal-immutable-arraybuffer/blob/d4fac6c6602c5fa5a1d3769242f042758dc43db6/immu-arrayBuffers.pdf), [video](https://www.youtube.com/watch?v=CP_5Yo9h84k))
+- October 2024 ([slides.key](https://github.com/tc39/proposal-immutable-arraybuffer/blob/d4fac6c6602c5fa5a1d3769242f042758dc43db6/immu-arrayBuffers.key), [slides.pdf](https://github.com/tc39/proposal-immutable-arraybuffer/blob/d4fac6c6602c5fa5a1d3769242f042758dc43db6/immu-arrayBuffers.pdf), [video](https://www.youtube.com/watch?v=CP_5Yo9h84k))
 
 ## Background
 
