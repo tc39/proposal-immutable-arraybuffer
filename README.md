@@ -14,7 +14,7 @@ A TC39 proposal for immutable ArrayBuffers.
 - Richard Gibson (@gibson042)
 - Jack-Works (@Jack-Works)
 
-**Specification**: https://papers.agoric.com/tc39-proposal-immutable-arraybuffer/
+**Specification**: https://tc39.es/tc39-proposal-immutable-arraybuffer/
 
 ## Presentation history
 
