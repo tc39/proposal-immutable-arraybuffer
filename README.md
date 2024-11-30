@@ -6,9 +6,9 @@ A TC39 proposal for immutable ArrayBuffers.
 
 [The TC39 Process](https://tc39.es/process-document/)
 
-**Stage**: 0
+**Stage**: 1
 
-**Champions**: 
+**Champions**:
 - Mark S. Miller (@erights)
 - Peter Hoddie (@phoddie)
 - Richard Gibson (@gibson042)
