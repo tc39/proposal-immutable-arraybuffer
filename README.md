@@ -133,10 +133,10 @@ No, TypedArray index properties should continue to track the state of the underl
 
 <dt>
 
-Should `transferToImmutable` support a _newByteLength_ argument?
+Should `transferToImmutable` support a `newByteLength` argument?
 </dt>
 <dd>
-It might be useful for truncation, but probably rarely for expansion because the output would have an all-zeroes suffix that could not be changed.
+https://github.com/tc39/proposal-immutable-arraybuffer/issues/15
 </dd>
 
 
@@ -148,26 +148,20 @@ Should ArrayBuffers support zero-copy slices (e.g., `arrayBuffer.sliceToImmutabl
 https://github.com/tc39/proposal-immutable-arraybuffer/issues/9
 </dd>
 
-
-<dt>
-Should trying to write data in an immutable ArrayBuffer via a TypedArray element set throw, even though trying to write out-of-bounds or to a detached ArrayBuffer does not?
-</dt>
-
-
 <dt>
 
-Should TypedArray write methods (`copyWithin`, `fill`, `reverse`, `set`, etc.) throw when their backing ArrayBuffer is immutable but the targeted range is zero-length? If so, how early or late in the algorithm? The methods currently inspect arguments after ValidateTypedArray.
+Should the new getter be name `immutable` or `mutable`?
 </dt>
-
+<dd>
+https://github.com/tc39/proposal-immutable-arraybuffer/issues/10
+</dd>
 
 <dt>
 
-Similarly,
-* How early or late in SetViewValue against an immutable ArrayBuffer should an exception be thrown? It currently inspects arguments *before* IsViewOutOfBounds.
-* Likewise for abstract operations such as ArrayBufferCopyAndDetach (which currently checks IsSharedArrayBuffer, then _newLength_, then IsDetachedBuffer).
-* And also for `Atomics` functions.
-
+Order of operations, when to throw or silently do nothing?
 </dt>
-
+<dd>
+https://github.com/tc39/proposal-immutable-arraybuffer/issues/16
+</dd>
 
 <dl>
