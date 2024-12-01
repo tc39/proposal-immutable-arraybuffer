@@ -100,13 +100,13 @@ assert(String.fromCharCode(...result) === '12:hello world!,');
 ### Polyfill/transpiler implementations
 
 * [endo immutable-arraybuffer](https://github.com/endojs/endo/tree/master/packages/immutable-arraybuffer)
+* XS (Need link)
 
 ### Native implementations
 
 Tracking issues to be added:
 - JavaScriptCore
 - SpiderMonkey
-- XS
 - V8
 
 ## Q&A
