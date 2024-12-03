@@ -637,11 +637,11 @@ contributors: Mark S. Miller, Richard Gibson
       <ins class="block">
 
         <emu-clause id="sec-arraybuffer.prototype.transfertoimmutable">
-          <h1>ArrayBuffer.prototype.transferToImmutable ( )</h1>
+          <h1>ArrayBuffer.prototype.transferToImmutable ( [ _newLength_ ] )</h1>
           <p>This method performs the following steps when called:</p>
           <emu-alg>
             1. Let _O_ be the *this* value.
-            1. Return ? ArrayBufferCopyAndDetach(_O_, *undefined*, ~immutable~).
+            1. Return ? ArrayBufferCopyAndDetach(_O_, _newLength_, ~immutable~).
           </emu-alg>
         </emu-clause>
       </ins>

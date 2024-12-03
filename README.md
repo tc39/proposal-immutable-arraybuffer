@@ -54,7 +54,7 @@ The [OCapN](https://ocapn.org/) network protocol treats strings and byte-arrays 
 ## Solution
 
 This proposal introduces additional methods and read-only accessor properties to `ArrayBuffer.prototype` that fit naturally into those explained above. Just as a buffer can be resizable or not, and detached or not, this proposal enables buffers to be immutable or not. Just as `transferToFixedSize` moves the contents of a original buffer into a newly created non-resizable buffer, this proposal provides a transfer operation that moves the contents of an original original buffer into a newly created immutable buffer. Altogether, this proposal only adds to `ArrayBuffer.prototype` one method
-- `transferToImmutable() :ArrayBuffer` -- move the contents of the original buffer into a new immutable buffer, detach the original buffer, and return the new buffer.
+- `transferToImmutable(newByteLength?: number) :ArrayBuffer` -- move the contents of the original buffer into a new immutable buffer, detach the original buffer, and return the new buffer.
 
 and one read-only accessor
 - `immutable: boolean` -- is this buffer immutable, or can its contents be changed?
@@ -128,15 +128,6 @@ Should the index properties of a TypedArray backed by an immutable ArrayBuffer b
 </dt>
 <dd>
 No, TypedArray index properties should continue to track the state of the underlying buffer without individual bookkeeping.
-</dd>
-
-
-<dt>
-
-Should `transferToImmutable` support a `newByteLength` argument?
-</dt>
-<dd>
-https://github.com/tc39/proposal-immutable-arraybuffer/issues/15
 </dd>
 
 
