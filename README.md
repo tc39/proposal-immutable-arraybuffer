@@ -53,12 +53,23 @@ The [OCapN](https://ocapn.org/) network protocol treats strings and byte-arrays 
 
 [Readonly Collections](https://github.com/tc39/proposal-readonly-collections), especially [issue #10](https://github.com/tc39/proposal-readonly-collections/issues/10)
 
+wasm [issue #1162](https://github.com/WebAssembly/design/issues/1162#issuecomment-2560354923)
+
+w3c TPAC talk [Zero-copy operations on the web](https://www.w3.org/2020/Talks/TPAC/unconference/zerocopy.pdf)
+
 web-bluetooth [read-only ArrayBuffer](https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer), especially [issue #300](https://github.com/WebBluetoothCG/web-bluetooth/issues/300#issuecomment-2560251857)
 
 gpuweb [issue #2072](https://github.com/gpuweb/gpuweb/issues/2072#issuecomment-2560291036), [issue #747](https://github.com/gpuweb/gpuweb/issues/747#issuecomment-2560254816), and [SharedValueTable proposal](https://hackmd.io/@webgpu/S1f56dN8s)
 
 webidl [Frozen Array](https://webidl.spec.whatwg.org/#idl-frozen-array)
 
+webcodecs [issue #80](https://github.com/w3c/webcodecs/issues/80#issuecomment-2560331900), [issue #104](https://github.com/w3c/webcodecs/issues/104#issuecomment-2560334782), and [issue #212](https://github.com/w3c/webcodecs/issues/212#issuecomment-2560348504)
+
+web transport [issue #131](https://github.com/w3c/webtransport/issues/131#issuecomment-2560357416)
+
+whatwg streams [issue #495](https://github.com/whatwg/streams/issues/495#issuecomment-2560361444)
+
+w3c machine learning workshop [issue #93](https://github.com/w3c/machine-learning-workshop/issues/93#issuecomment-2560365962)
 
 ## Solution
 
