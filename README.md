@@ -125,25 +125,31 @@ Tracking issues to be added:
 
 
 <dt>
+
 Why can't an immutable ArrayBuffer be detached/transferred?
 </dt>
 <dd>
+
 Because that would result in observable changes to any TypedArray or DataView backed by it.
 </dd>
 
 
 <dt>
+
 Should the index properties of a TypedArray backed by an immutable ArrayBuffer be configurable and writable?
 </dt>
 <dd>
+
 No, TypedArray index properties should continue to track the state of the underlying buffer without individual bookkeeping.
 </dd>
 
 
 <dt>
+
 Should ArrayBuffers support zero-copy slices (e.g., `arrayBuffer.sliceToImmutable()`)? https://github.com/tc39/proposal-immutable-arraybuffer/issues/9
 </dt>
 <dd>
+
 Yes. As agreed at the December tc39 plenary, we won't specify that the implementation be zero-copy. But providing this operation ***enables*** some implementations to easily implement it as zero-copy.
 </dd>
 
@@ -152,6 +158,7 @@ Yes. As agreed at the December tc39 plenary, we won't specify that the implement
 Should the new getter be name `immutable` or `mutable`? https://github.com/tc39/proposal-immutable-arraybuffer/issues/10
 </dt>
 <dd>
+
 `immutable`. As agreed at the December tc39 plenary, by following the defaults-to-false principle, feature tests such as `if (buf.immutable) {` will be falsy on engines that have not yet implemented this proposal.
 </dd>
 
@@ -161,6 +168,7 @@ Order of operations, when to throw or silently do nothing? https://github.com/tc
 
 </dt>
 <dd>
+
 We will drive the resolution to this from implementor feedback. But when this by itself is not a deciding factor, we prefer failure to throw rather than be silent. This existing XS implementation follows that principle.
 </dd>
 
