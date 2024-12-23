@@ -155,7 +155,7 @@ Yes. As agreed at the December tc39 plenary, we won't specify that the implement
 
 <dt>
 
-Should the new getter be name `immutable` or `mutable`? https://github.com/tc39/proposal-immutable-arraybuffer/issues/10
+Should the new getter be named `immutable` or `mutable`? https://github.com/tc39/proposal-immutable-arraybuffer/issues/10
 </dt>
 <dd>
 
