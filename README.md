@@ -19,7 +19,7 @@ A TC39 proposal for immutable ArrayBuffers.
 ## Presentation history
 
 - ***for stage 1*** - October 2024 tc39 plenary ([slides.key](./immu-arraybuffer-talks/immu-arrayBuffers-stage1-as-recorded.key), [slides.pdf](./immu-arraybuffer-talks/immu-arrayBuffers-stage1.pdf), [video](https://www.youtube.com/watch?v=CP_5Yo9h84k))
-- ***for stage 2*** - To be presented at December 2024 tc39 plenary ([slides.key](./immu-arraybuffer-talks/immu-arrayBuffers-stage2.key). [slides.pdf](./immu-arraybuffer-talks/immu-arrayBuffers-stage2.pdf), [docs slides](https://docs.google.com/presentation/d/1S1ixC7AVg3s_p4ZNhu3zBMcIcKbFkmp6umnsQUKOIqw/edit?usp=sharing), [video](https://www.youtube.com/watch?v=Fy_AnIbAAm8))
+- ***for stage 2*** - December 2024 tc39 plenary ([slides.key](./immu-arraybuffer-talks/immu-arrayBuffers-stage2.key). [slides.pdf](./immu-arraybuffer-talks/immu-arrayBuffers-stage2.pdf), [docs slides](https://docs.google.com/presentation/d/1S1ixC7AVg3s_p4ZNhu3zBMcIcKbFkmp6umnsQUKOIqw/edit?usp=sharing), [video](https://www.youtube.com/watch?v=Fy_AnIbAAm8))
 
 ## Background
 
