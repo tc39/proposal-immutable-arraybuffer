@@ -47,9 +47,18 @@ APIs that accept ArrayBuffers and/or objects backed by them could also benefit f
 
 The [OCapN](https://ocapn.org/) network protocol treats strings and byte-arrays as distinct forms of bulk data to be transmitted by copy. At JavaScript endpoints speaking OCapN such as [@endo/pass-style](https://www.npmjs.com/package/@endo/pass-style) + [@endo/marshal](https://www.npmjs.com/package/@endo/marshal), JavaScript strings represent OCapN strings. The immutability of strings in the JavaScript language reflects their by-copy nature in the protocol. Likewise, to reflect an OCapN byte-array well into the JavaScript language, an immutable container of bulk binary data is required. There currently are none, but an Immutable `ArrayBuffer` would provide exactly the necessary low-level machinery.
 
-## Prior proposals with overlapping goals
+## Prior proposals or issues with overlapping goals
 
-[Limited ArrayBuffer](https://github.com/tc39/proposal-limited-arraybuffer)
+[Limited ArrayBuffer](https://github.com/tc39/proposal-limited-arraybuffer), especially [issue #16](https://github.com/tc39/proposal-limited-arraybuffer/issues/16)
+
+[Readonly Collections](https://github.com/tc39/proposal-readonly-collections), especially [issue #10](https://github.com/tc39/proposal-readonly-collections/issues/10)
+
+web-bluetooth [read-only ArrayBuffer](https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer), especially [issue #300](https://github.com/WebBluetoothCG/web-bluetooth/issues/300#issuecomment-2560251857)
+
+gpuweb [issue #2072](https://github.com/gpuweb/gpuweb/issues/2072#issuecomment-2560291036), [issue #747](https://github.com/gpuweb/gpuweb/issues/747#issuecomment-2560254816), and [SharedValueTable proposal](https://hackmd.io/@webgpu/S1f56dN8s)
+
+webidl [Frozen Array](https://webidl.spec.whatwg.org/#idl-frozen-array)
+
 
 ## Solution
 
@@ -132,27 +141,27 @@ No, TypedArray index properties should continue to track the state of the underl
 
 
 <dt>
-
-Should ArrayBuffers support zero-copy slices (e.g., `arrayBuffer.sliceToImmutable()`)?
+Should ArrayBuffers support zero-copy slices (e.g., `arrayBuffer.sliceToImmutable()`)? https://github.com/tc39/proposal-immutable-arraybuffer/issues/9
 </dt>
 <dd>
-https://github.com/tc39/proposal-immutable-arraybuffer/issues/9
+Yes. As agreed at the December tc39 plenary, we won't specify that the implementation be zero-copy. But providing this operation ***enables*** some implementations to easily implement it as zero-copy.
 </dd>
 
 <dt>
 
-Should the new getter be name `immutable` or `mutable`?
+Should the new getter be name `immutable` or `mutable`? https://github.com/tc39/proposal-immutable-arraybuffer/issues/10
 </dt>
 <dd>
-https://github.com/tc39/proposal-immutable-arraybuffer/issues/10
+`immutable`. As agreed at the December tc39 plenary, by following the defaults-to-false principle, feature tests such as `if (buf.immutable) {` will be falsy on engines that have not yet implemented this proposal.
 </dd>
 
 <dt>
 
-Order of operations, when to throw or silently do nothing?
+Order of operations, when to throw or silently do nothing? https://github.com/tc39/proposal-immutable-arraybuffer/issues/16
+
 </dt>
 <dd>
-https://github.com/tc39/proposal-immutable-arraybuffer/issues/16
+We will drive the resolution to this from implementor feedback. But when this by itself is not a deciding factor, we prefer failure to throw rather than be silent. This existing XS implementation follows that principle.
 </dd>
 
 <dl>
