@@ -430,6 +430,33 @@ contributors: Mark S. Miller, Richard Gibson
         </emu-alg>
       </emu-clause>
 
+      <ins class="block">
+
+        <emu-clause id="sec-allocateimmutablearraybuffer" type="abstract operation">
+          <h1>
+            AllocateImmutableArrayBuffer (
+              _constructor_: a constructor,
+              _byteLength_: a non-negative integer,
+              _fromBlock_: a Data Block,
+              _fromIndex_: a non-negative integer,
+              _count_: a non-negative integer,
+            ): either a normal completion containing an ArrayBuffer or a throw completion
+          </h1>
+          <dl class="header">
+            <dt>description</dt>
+            <dd>It is used to create an immutable ArrayBuffer (i.e., an ArrayBuffer with a an [[ArrayBufferIsImmutable]] slot) with contents from _fromBlock_.</dd>
+          </dl>
+          <emu-alg>
+            1. Assert: _constructor_ is %ArrayBuffer%.
+            1. Assert: _count_ ≤ _byteLength_.
+            1. Let _newBuffer_ be ? <emu-meta suppress-effects="user-code">AllocateArrayBuffer(_constructor_, _byteLength_, ~immutable~)</emu-meta>.
+            1. Let _toBlock_ be _newBuffer_.[[ArrayBufferData]].
+            1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, 0, _count_).
+            1. Return _newBuffer_.
+          </emu-alg>
+        </emu-clause>
+      </ins>
+
       <emu-clause id="sec-arraybuffercopyanddetach" type="abstract operation" number="3">
         <h1>
           ArrayBufferCopyAndDetach (
@@ -449,15 +476,16 @@ contributors: Mark S. Miller, Richard Gibson
             1. Let _newByteLength_ be ? ToIndex(_newLength_).
           1. If IsDetachedBuffer(_arrayBuffer_) is *true*, throw a *TypeError* exception.
           1. <ins>If IsImmutableBuffer(_arrayBuffer_) is *true*, throw a *TypeError* exception.</ins>
+          1. <ins>Let _copyLength_ be min(_newByteLength_, _arrayBuffer_.[[ArrayBufferByteLength]]).</ins>
+          1. <ins>If _preserveResizability_ is ~immutable~, then</ins>
+            1. <ins>Return ? AllocateImmutableArrayBuffer(%ArrayBuffer%, _newByteLength_, _arrayBuffer_.[[ArrayBufferData]], 0, _copyLength_).</ins>
           1. If _preserveResizability_ is ~preserve-resizability~ and IsFixedLengthArrayBuffer(_arrayBuffer_) is *false*, then
             1. Let _newMaxByteLength_ be _arrayBuffer_.[[ArrayBufferMaxByteLength]].
-          1. <ins>Else if _preserveResizability_ is ~immutable~, then</ins>
-            1. <ins>Let _newMaxByteLength_ be ~immutable~.</ins>
           1. Else,
             1. Let _newMaxByteLength_ be ~empty~.
           1. If _arrayBuffer_.[[ArrayBufferDetachKey]] is not *undefined*, throw a *TypeError* exception.
           1. Let _newBuffer_ be ? <emu-meta suppress-effects="user-code">AllocateArrayBuffer(%ArrayBuffer%, _newByteLength_, _newMaxByteLength_)</emu-meta>.
-          1. Let _copyLength_ be min(_newByteLength_, _arrayBuffer_.[[ArrayBufferByteLength]]).
+          1. <del>Let _copyLength_ be min(_newByteLength_, _arrayBuffer_.[[ArrayBufferByteLength]]).</del>
           1. Let _fromBlock_ be _arrayBuffer_.[[ArrayBufferData]].
           1. Let _toBlock_ be _newBuffer_.[[ArrayBufferData]].
           1. <ins>NOTE: This is the only step that can write into the Data Block of an immutable ArrayBuffer.</ins>
@@ -636,7 +664,6 @@ contributors: Mark S. Miller, Richard Gibson
       </emu-clause>
 
       <ins class="block">
-
         <emu-clause id="sec-arraybuffer.prototype.transfertoimmutable">
           <h1>ArrayBuffer.prototype.transferToImmutable ( [ _newLength_ ] )</h1>
           <p>This method performs the following steps when called:</p>
