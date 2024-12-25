@@ -697,6 +697,34 @@ contributors: Mark S. Miller, Richard Gibson
       </emu-clause>
 
       <ins class="block">
+
+        <emu-clause id="sec-arraybuffer.prototype.slicetoimmutable">
+          <h1>ArrayBuffer.prototype.sliceToImmutable ( _start_, _end_ )</h1>
+          <p>This method performs the following steps when called:</p>
+          <emu-alg>
+            1. Let _O_ be the *this* value.
+            1. Perform ? RequireInternalSlot(_O_, [[ArrayBufferData]]).
+            1. If IsSharedArrayBuffer(_O_) is *true*, throw a *TypeError* exception.
+            1. TODO: Confirm inclusion of this redundant check.
+            1. If IsDetachedBuffer(_O_) is *true*, throw a *TypeError* exception.
+            1. Let _len_ be _O_.[[ArrayBufferByteLength]].
+            1. Let _bounds_ be ? ResolveBounds(_len_, _start_, _end_).
+            1. Let _first_ be _bounds_.[[From]].
+            1. Let _final_ be _bounds_.[[To]].
+            1. TODO: Confirm this strictness vs. the conventional `max(_final_ - _first_, 0)`.
+            1. Let _newLen_ be _final_ - _first_.
+            1. If _newLen_ &lt; 0, throw a *RangeError* exception.
+            1. Let _copyLen_ be min(_newLen_, _len_).
+            1. NOTE: Side-effects of the above steps may have detached or resized _O_. This algorithm proceeds only when _O_ is not detached, even if _newLen_ is 0.
+            1. If IsDetachedBuffer(_O_) is *true*, throw a *TypeError* exception.
+            1. Let _newBuffer_ be ? AllocateImmutableArrayBuffer(%ArrayBuffer%, _newLen_, _O_.[[ArrayBufferData]], _first_, _copyLen_).
+            1. Return _newBuffer_.
+          </emu-alg>
+        </emu-clause>
+      </ins>
+
+      <ins class="block">
+
         <emu-clause id="sec-arraybuffer.prototype.transfertoimmutable">
           <h1>ArrayBuffer.prototype.transferToImmutable ( [ _newLength_ ] )</h1>
           <p>This method performs the following steps when called:</p>
