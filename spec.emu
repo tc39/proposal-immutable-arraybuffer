@@ -12,6 +12,36 @@ shortname: proposal-immutable-arraybuffer
 contributors: Mark S. Miller, Richard Gibson
 </pre>
 
+<emu-clause id="sec-operations-on-objects" number="7">
+  <h1>Operations on Objects</h1>
+
+  <ins class="block">
+
+    <emu-clause id="sec-resolvebounds" type="abstract operation">
+      <h1>
+        ResolveBounds (
+          _len_: an integer,
+          _start_: an ECMAScript language value,
+          _end_: an ECMAScript language value,
+        ): either a normal completion containing a Record with fields [[From]] (a non-negative integer) and [[To]] (a non-negative integer) or a throw completion
+      </h1>
+      <dl class="header">
+      </dl>
+      <emu-alg>
+        1. Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).
+        1. If _relativeStart_ = -∞, let _from_ be 0.
+        1. Else if _relativeStart_ &lt; 0, let _from_ be max(_len_ + _relativeStart_, 0).
+        1. Else, let _from_ be min(_relativeStart_, _len_).
+        1. If _end_ is *undefined*, let _relativeEnd_ be _len_; else let _relativeEnd_ be ? ToIntegerOrInfinity(_end_).
+        1. If _relativeEnd_ = -∞, let _to_ be 0.
+        1. Else if _relativeEnd_ &lt; 0, let _to_ be max(_len_ + _relativeEnd_, 0).
+        1. Else, let _to_ be min(_relativeEnd_, _len_).
+        1. Return the Record { [[From]]: _from_, [[To]]: _to_ }.
+      </emu-alg>
+    </emu-clause>
+  </ins>
+</emu-clause>
+
 <emu-clause id="sec-ordinary-and-exotic-objects-behaviours" number="10">
   <h1>Ordinary and Exotic Objects Behaviours</h1>
 
@@ -487,8 +517,8 @@ contributors: Mark S. Miller, Richard Gibson
           1. Let _newBuffer_ be ? <emu-meta suppress-effects="user-code">AllocateArrayBuffer(%ArrayBuffer%, _newByteLength_, _newMaxByteLength_)</emu-meta>.
           1. <del>Let _copyLength_ be min(_newByteLength_, _arrayBuffer_.[[ArrayBufferByteLength]]).</del>
           1. Let _fromBlock_ be _arrayBuffer_.[[ArrayBufferData]].
-          1. Let _toBlock_ be _newBuffer_.[[ArrayBufferData]].
           1. <ins>NOTE: This is the only step that can write into the Data Block of an immutable ArrayBuffer.</ins>
+          1. Let _toBlock_ be _newBuffer_.[[ArrayBufferData]].
           1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, 0, _copyLength_).
           1. NOTE: Neither creation of the new Data Block nor copying from the old Data Block are observable. Implementations may implement this method as a zero-copy move or a `realloc`.
           1. Perform ! DetachArrayBuffer(_arrayBuffer_).
@@ -634,14 +664,17 @@ contributors: Mark S. Miller, Richard Gibson
           1. If IsSharedArrayBuffer(_O_) is *true*, throw a *TypeError* exception.
           1. If IsDetachedBuffer(_O_) is *true*, throw a *TypeError* exception.
           1. Let _len_ be _O_.[[ArrayBufferByteLength]].
-          1. Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).
-          1. If _relativeStart_ = -∞, let _first_ be 0.
-          1. Else if _relativeStart_ &lt; 0, let _first_ be max(_len_ + _relativeStart_, 0).
-          1. Else, let _first_ be min(_relativeStart_, _len_).
-          1. If _end_ is *undefined*, let _relativeEnd_ be _len_; else let _relativeEnd_ be ? ToIntegerOrInfinity(_end_).
-          1. If _relativeEnd_ = -∞, let _final_ be 0.
-          1. Else if _relativeEnd_ &lt; 0, let _final_ be max(_len_ + _relativeEnd_, 0).
-          1. Else, let _final_ be min(_relativeEnd_, _len_).
+          1. <del>Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).</del>
+          1. <del>If _relativeStart_ = -∞, let _first_ be 0.</del>
+          1. <del>Else if _relativeStart_ &lt; 0, let _first_ be max(_len_ + _relativeStart_, 0).</del>
+          1. <del>Else, let _first_ be min(_relativeStart_, _len_).</del>
+          1. <del>If _end_ is *undefined*, let _relativeEnd_ be _len_; else let _relativeEnd_ be ? ToIntegerOrInfinity(_end_).</del>
+          1. <del>If _relativeEnd_ = -∞, let _final_ be 0.</del>
+          1. <del>Else if _relativeEnd_ &lt; 0, let _final_ be max(_len_ + _relativeEnd_, 0).</del>
+          1. <del>Else, let _final_ be min(_relativeEnd_, _len_).</del>
+          1. <ins>Let _bounds_ be ? ResolveBounds(_len_, _start_, _end_).</ins>
+          1. <ins>Let _first_ be _bounds_.[[From]].</ins>
+          1. <ins>Let _final_ be _bounds_.[[To]].</ins>
           1. Let _newLen_ be max(_final_ - _first_, 0).
           1. Let _ctor_ be ? SpeciesConstructor(_O_, %ArrayBuffer%).
           1. Let _new_ be ? Construct(_ctor_, « 𝔽(_newLen_) »).
