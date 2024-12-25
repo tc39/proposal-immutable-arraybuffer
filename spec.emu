@@ -12,6 +12,15 @@ shortname: proposal-immutable-arraybuffer
 contributors: Mark S. Miller, Richard Gibson
 </pre>
 
+<emu-clause id="sec-ecmascript-data-types-and-values" number="6">
+  <h1>ECMAScript Data Types and Values</h1>
+
+  <emu-clause id="sec-data-blocks" number="2.9">
+    <h1>Data Blocks</h1>
+    <p>A data block that resides in memory that can be referenced from multiple agents concurrently is designated a <dfn variants="Shared Data Blocks">Shared Data Block</dfn>. A Shared Data Block has an identity (for the purposes of equality testing Shared Data Block values) that is <em>address-free</em>: it is tied not to the virtual addresses the block is mapped to in any process, but to the set of locations in memory that the block represents. Two <del>data blocks</del> <ins>Shared Data Blocks</ins> are equal only if the sets of the locations they contain are equal; otherwise, they are not equal and the intersection of the sets of locations they contain is empty. Finally, Shared Data Blocks can be distinguished from Data Blocks.</p>
+  </emu-clause>
+</emu-clause>
+
 <emu-clause id="sec-operations-on-objects" number="7">
   <h1>Operations on Objects</h1>
 
@@ -484,6 +493,9 @@ contributors: Mark S. Miller, Richard Gibson
             1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, 0, _count_).
             1. Return _newBuffer_.
           </emu-alg>
+          <emu-note>
+            <p>Because neither the identity of a Data Block nor the set of locations in memory represented by it are observable, implementations may implement this operation without allocating new memory locations when _fromBlock_ is the value of the [[ArrayBufferData]] slot for some other immutable ArrayBuffer (and therefore already immutable) and _count_ = _byteLength_.</p>
+          </emu-note>
         </emu-clause>
       </ins>
 
