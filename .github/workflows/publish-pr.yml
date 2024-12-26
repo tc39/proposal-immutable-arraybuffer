@@ -25,12 +25,10 @@ jobs:
       with:
         script: |
           const { owner, repo } = context.repo;
-          const listArtifactsResponse = await github.rest.actions.listWorkflowRunArtifacts({
-            owner,
-            repo,
-            run_id: ${{ github.event.workflow_run.id }},
-            name: 'result',
-          });
+          const run_id = ${{ github.event.workflow_run.id }};
+          const listArtifactsQuery = { owner, repo, run_id, name: 'result' };
+          const listArtifactsResponse =
+            await github.rest.actions.listWorkflowRunArtifacts(listArtifactsQuery);
           const { total_count, artifacts } = listArtifactsResponse.data;
           if (total_count !== 1) {
             const summary = artifacts?.map(artifact => {
@@ -40,15 +38,14 @@ jobs:
             const repr = value => JSON.stringify(value);
             throw Error(`Expected 1 artifact, got ${total_count} ${repr(summary ?? [])}`);
           }
-          const artifactData = {
+          const downloadResponse = await github.rest.actions.downloadArtifact({
             owner,
             repo,
             artifact_id: artifacts[0].id,
             archive_format: 'zip',
-          };
-          const download = await github.actions.downloadArtifact(artifactData);
+          });
           const fs = require('fs');
-          fs.writeFileSync('${{ github.workspace }}/result.zip', Buffer.from(download.data));
+          fs.writeFileSync('${{ github.workspace }}/result.zip', Buffer.from(downloadResponse.data));
     - name: Provide result directory
       run: rmdir -rf result && mkdir -p result
     - run: unzip -o result.zip -d result
