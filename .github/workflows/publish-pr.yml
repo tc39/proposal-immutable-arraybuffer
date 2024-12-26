@@ -1,4 +1,5 @@
 name: Publish PR
+run-name: ${{ github.workflow_run.display_title }}
 
 on:
   workflow_run:
@@ -15,7 +16,6 @@ jobs:
         github.event.workflow_run.conclusion == 'success'
       }}
     steps:
-    - uses: actions/checkout@v4
     - name: Print event info
       uses: actions/github-script@v7
       with:
@@ -25,21 +25,13 @@ jobs:
       with:
         script: |
           const { owner, repo } = context.repo;
-          const getKeys = (obj, until = Object.prototype) => {
-            if (!obj || obj === until) return [];
-            const ownKeys = Reflect.ownKeys(obj);
-            const protoKeys = getKeys(Object.getPrototypeOf(obj), until);
-            return new Set([...ownKeys, ...protoKeys]);
-          };
-          console.log('github', [...getKeys(github)]);
-          console.log('github.rest', [...getKeys(github.rest)]);
-          console.log('github.rest.actions', [...getKeys(github.rest.actions)]);
-          const { total_count, artifacts } = await github.rest.actions.listWorkflowRunArtifacts({
+          const listArtifactsResponse = await github.rest.actions.listWorkflowRunArtifacts({
             owner,
             repo,
             run_id: ${{ github.event.workflow_run.id }},
             name: 'result',
           });
+          const { total_count, artifacts } = listArtifactsResponse.data;
           if (total_count !== 1) {
             const summary = artifacts?.map(artifact => {
               const { name, size_in_bytes, url } = artifact;
