@@ -29,11 +29,6 @@ jobs:
         script: |
           const { owner, repo } = context.repo;
           const run_id = ${{ github.run_id }};
-          console.log(
-            'all artifacts for run id ${{ github.run_id }}',
-            await github.rest.actions.listWorkflowRunArtifacts({ owner, repo, run_id }),
-          );
-          console.log(
-            '"result" artifacts for run id ${{ github.run_id }}',
-            await github.rest.actions.listWorkflowRunArtifacts({ owner, repo, run_id, name: "result" }),
-          );
+          const listArtifactsResponse =
+            await github.rest.actions.listWorkflowRunArtifacts({ owner, repo, run_id });
+          console.log(`artifacts for run id ${run_id}`, listArtifactsResponse?.data);
