@@ -16,7 +16,24 @@ jobs:
     - name: Save PR number
       run: echo ${{ github.event.number }} > build/pr-number.txt
     - uses: actions/upload-artifact@v4
+      id: upload
       if: ${{ !github.event.repository.fork }}
       with:
         name: result
         path: build/
+    - name: Echo artifact ID
+      run: echo 'Artifact ID is ${{ steps.upload.outputs.artifact-id }}'
+    - name: Verify artifact discoverability
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const run_id = ${{ github.run_id }};
+          console.log(
+            'all artifacts for run id ${{ github.run_id }}',
+            await github.rest.actions.listWorkflowRunArtifacts({ owner, repo, run_id }),
+          );
+          console.log(
+            '"result" artifacts for run id ${{ github.run_id }}',
+            await github.rest.actions.listWorkflowRunArtifacts({ owner, repo, run_id, name: "result" }),
+          );
