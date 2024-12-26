@@ -1,0 +1,22 @@
+name: Render PR
+
+on: [pull_request]
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: '[node LTS] npm install'
+      uses: ljharb/actions/node/install@main
+      with:
+        node-version: lts/*
+    - run: npm run build
+    - name: Save PR number
+      run: echo ${{ github.event.number }} > build/pr-number.txt
+    - uses: actions/upload-artifact@v4
+      if: ${{ !github.event.repository.fork }}
+      with:
+        name: result
+        path: build/

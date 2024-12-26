@@ -1,0 +1,23 @@
+name: Publish
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: '[node LTS] npm install'
+      uses: ljharb/actions/node/install@main
+      with:
+        node-version: lts/*
+    - run: npm run build
+    - name: Publish to gh-pages
+      uses: JamesIves/github-pages-deploy-action@v4.3.3
+      with:
+        branch: gh-pages
+        folder: build
+        clean-exclude: |
+          pr

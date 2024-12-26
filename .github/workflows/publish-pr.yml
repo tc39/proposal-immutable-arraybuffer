@@ -1,0 +1,80 @@
+name: Publish PR
+
+on:
+  workflow_run:
+    workflows: ['Render PR']
+    types: [completed]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: >
+      ${{
+        !github.event.repository.fork &&
+        github.event.workflow_run.event == 'pull_request' &&
+        github.event.workflow_run.conclusion == 'success'
+      }}
+    steps:
+    - name: Print event info
+      uses: actions/github-script@v7
+      with:
+        script: 'console.log(${{ toJson(github.event) }});'
+    - name: Download zipball
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const { total_count, artifacts } = await github.actions.listWorkflowRunArtifacts({
+            owner,
+            repo,
+            run_id: ${{ github.event.workflow_run.id }},
+            name: 'result',
+          });
+          if (total_count !== 1) {
+            const summary = artifacts?.map(artifact => {
+              const { name, size_in_bytes, url } = artifact;
+              return { name, size_in_bytes, url };
+            });
+            const repr = value => JSON.stringify(value);
+            throw Error(`Expected 1 artifact, got ${total_count} ${repr(summary ?? [])}`);
+          }
+          const artifactData = {
+            owner,
+            repo,
+            artifact_id: artifacts[0].id,
+            archive_format: 'zip',
+          };
+          const download = await github.actions.downloadArtifact(artifactData);
+          const fs = require('fs');
+          fs.writeFileSync('${{ github.workspace }}/result.zip', Buffer.from(download.data));
+    - name: Provide result directory
+      run: rmdir -rf result && mkdir -p result
+    - run: unzip -o result.zip -d result
+    - run: ls result
+    - name: Extract PR number
+      id: extract-pr-number
+      run: |
+        cd result
+        awk -vok=1 \
+          '{ print; if(!match($0, /^[1-9][0-9]*$/)) ok=0; } END { exit !(NR==1 && ok); }' \
+          pr-number.txt
+        echo "number=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+        rm pr-number.txt
+    - name: Publish to gh-pages
+      uses: JamesIves/github-pages-deploy-action@v4.3.3
+      with:
+        branch: gh-pages
+        folder: result
+        target-folder: pr/${{ steps.extract-pr-number.outputs.number }}
+    - name: Determine gh-pages url
+      id: get-pages-url
+      run: |
+        gh_pages_url="https://$(printf '%s' "$GITHUB_REPOSITORY" \
+          | sed 's#/#.github.io/#; s#^tc39.github.io/#tc39.es/#')"
+        echo "url=$gh_pages_url" >> $GITHUB_OUTPUT
+    - name: Provide PR comment
+      uses: phulsechinmay/rewritable-pr-comment@v0.3.0
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        message: |
+          The rendered spec for this PR is available at ${{ steps.get-pages-url.outputs.url }}.
