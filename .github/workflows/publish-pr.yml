@@ -25,6 +25,14 @@ jobs:
       with:
         script: |
           const { owner, repo } = context.repo;
+          const getKeys = (obj, until = Object.prototype) => {
+            if (!obj || obj === until) return [];
+            const ownKeys = Reflect.ownKeys(obj);
+            const protoKeys = getKeys(Object.getPrototypeOf(obj), until);
+            return new Set([...ownKeys, ...protoKeys]);
+          };
+          console.log('github', [...getKeys(github)]);
+          console.log('github.actions', [...getKeys(github.actions)]);
           const { total_count, artifacts } = await github.actions.listWorkflowRunArtifacts({
             owner,
             repo,
