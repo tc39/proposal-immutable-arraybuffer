@@ -57,11 +57,31 @@ jobs:
       id: extract-pr-number
       run: |
         cd result
-        awk -vok=1 \
+        awk -v ok=1 \
           '{ print; if(!match($0, /^[1-9][0-9]*$/)) ok=0; } END { exit !(NR==1 && ok); }' \
           pr-number.txt
         echo "number=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
         rm pr-number.txt
+    - name: Insert preview warning
+      env:
+        PR: ${{ steps.extract-pr-number.outputs.number }}
+      run: |
+        tmp="$(mktemp -u XXXXXXXX.json)"
+        repo_url="https://github.com/$GITHUB_REPOSITORY"
+        commit="$(git rev-parse --verify HEAD)"
+        jq -n --arg repo_url "$repo_url" --arg PR "$PR" --arg commit "$commit" '
+          def repo_link($args): $args as [$path, $contents]
+            | ($repo_url + ($path // "")) as $url
+            | "<a href=\"\($url | @html)\">\($contents // $url)</a>";
+          {
+            SUMMARY: "PR #\($PR)",
+            REPO_LINK: repo_link([]),
+            PR_LINK: repo_link(["/pull/" + $PR, "PR #\($PR)"]),
+            COMMIT_LINK: ("commit " + repo_link(["/commit/" + $commit, "<code>\($commit)</code>"])),
+          }
+        ' > "$tmp"
+        find result -name '*.html' -exec \
+          node scripts/insert_warning.mjs --strict scripts/pr_preview_warning.html "$tmp" '{}' '+'
     - name: Publish to gh-pages
       uses: JamesIves/github-pages-deploy-action@v4.3.3
       with:
