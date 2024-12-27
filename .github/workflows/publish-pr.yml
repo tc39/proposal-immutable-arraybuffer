@@ -1,5 +1,5 @@
 name: Publish PR
-run-name: ${{ github.workflow_run.display_title }}
+run-name: ${{ github.event.workflow_run.display_title }}
 
 on:
   workflow_run:
