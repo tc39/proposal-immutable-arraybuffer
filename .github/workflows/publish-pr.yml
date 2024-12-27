@@ -38,16 +38,18 @@ jobs:
             const repr = value => JSON.stringify(value);
             throw Error(`Expected 1 artifact, got ${total_count} ${repr(summary ?? [])}`);
           }
+          const artifact_id = artifacts[0].id;
+          console.log(`downloading artifact ${artifact_id}`);
           const downloadResponse = await github.rest.actions.downloadArtifact({
             owner,
             repo,
-            artifact_id: artifacts[0].id,
+            artifact_id,
             archive_format: 'zip',
           });
           const fs = require('fs');
           fs.writeFileSync('${{ github.workspace }}/result.zip', Buffer.from(downloadResponse.data));
     - name: Provide result directory
-      run: rmdir -rf result && mkdir -p result
+      run: rm -rf result && mkdir -p result
     - run: unzip -o result.zip -d result
     - run: ls result
     - name: Extract PR number
