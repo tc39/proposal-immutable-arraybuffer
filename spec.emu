@@ -6,8 +6,9 @@
 <pre class="metadata">
 title: Immutable ArrayBuffers
 status: proposal
-stage: 0
-shortname: &lt;a href="https://github.com/tc39/proposal-immutable-arraybuffer"&gt;proposal-immutable-arraybuffer&lt;/a&gt;
+stage: 2
+location: https://github.com/tc39/proposal-immutable-arraybuffer
+shortname: proposal-immutable-arraybuffer
 contributors: Mark S. Miller, Richard Gibson
 </pre>
 
