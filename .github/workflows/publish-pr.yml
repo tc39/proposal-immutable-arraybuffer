@@ -78,5 +78,7 @@ jobs:
       uses: phulsechinmay/rewritable-pr-comment@v0.3.0
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ISSUE_ID: ${{ steps.extract-pr-number.outputs.number }}
         message: |
-          The rendered spec for this PR is available at ${{ steps.get-pages-url.outputs.url }}.
+          The rendered spec for this PR is available at
+          ${{ steps.get-pages-url.outputs.url }}/pr/${{ steps.extract-pr-number.outputs.number }}.
