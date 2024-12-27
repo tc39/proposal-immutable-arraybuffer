@@ -16,6 +16,7 @@ jobs:
         github.event.workflow_run.conclusion == 'success'
       }}
     steps:
+    - uses: actions/checkout@v4
     - name: Print event info
       uses: actions/github-script@v7
       with:
