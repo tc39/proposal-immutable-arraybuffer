@@ -39,14 +39,18 @@ const main = async args => {
   // Parse the template into DOM nodes for appending to page <head>s (metadata
   // such as <style> elements) or prepending to page <body>s (everything else).
   // https://html.spec.whatwg.org/multipage/dom.html#metadata-content-2
-  const metadataNames =
-    'base, link, meta, noscript, script, style, template, title'
-      .toUpperCase()
-      .split(', ');
+  // https://html.spec.whatwg.org/multipage/semantics.html#allowed-in-the-body
+  // https://html.spec.whatwg.org/multipage/links.html#body-ok
+  const bodyOkRelPatt =
+    /^(?:dns-prefetch|modulepreload|pingback|preconnect|prefetch|preload|stylesheet)$/i;
+  const forceHead = node =>
+    node.matches?.('base, style, title, meta:not([itemprop])') ||
+    (node.matches?.('link:not([itemprop])') &&
+      [...node.relList].some(rel => !rel.match(bodyOkRelPatt)));
   const insertDom = JSDOM.fragment(resolved);
   const headInserts = [], bodyInserts = [];
   for (const node of insertDom.childNodes) {
-    if (metadataNames.includes(node.nodeName)) headInserts.push(node);
+    if (forceHead(node)) headInserts.push(node);
     else bodyInserts.push(node);
   }
 
