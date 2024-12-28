@@ -3,44 +3,48 @@ import pathlib from 'node:path';
 import { parseArgs } from 'node:util';
 import { JSDOM, VirtualConsole } from 'jsdom';
 
-const { positionals: cliArgs, values: cliOpts } = parseArgs({
+const { positionals: cliArgs } = parseArgs({
   allowPositionals: true,
-  options: {
-    strict: { type: 'boolean' },
-  },
+  options: {},
 });
 if (cliArgs.length < 3) {
   const self = pathlib.relative(process.cwd(), process.argv[1]);
-  console.error(`Usage: node ${self} [--strict] <template.html> <data.json> <file.html>...
+  console.error(`Usage: node ${self} <template.html> <data.json> <file.html>...
 
 {{identifier}} substrings in template.html are replaced from data.json, then
 the result is inserted at the start of the body element in each file.html.`);
   process.exit(64);
 }
 
-const main = async (args, options) => {
+const main = async args => {
   const [templateFile, dataFile, ...files] = args;
-  const { strict } = options;
 
-  // Evaluate the template and parse it into nodes for inserting.
-  // Everything will be prepended to body elements except metadata elements,
-  // which will be appended to head elements.
+  // Substitute data into the template.
+  const template = fs.readFileSync(templateFile, 'utf8');
+  const { default: data } =
+    await import(pathlib.resolve(dataFile), { with: { type: 'json' } });
+  const formatErrors = [];
+  const placeholderPatt = /[{][{](?:([\p{ID_Start}$_][\p{ID_Continue}$]*)[}][}]|.*?(?:[}][}]|(?=[{][{])|$))/gsu;
+  const resolved = template.replaceAll(placeholderPatt, (m, name, i) => {
+    if (!name) {
+      const trunc = m.replace(/([^\n]{29}(?!$)|[^\n]{,29}(?=\n)).*/s, '$1…');
+      formatErrors.push(Error(`bad placeholder at index ${i}: ${trunc}`));
+    } else if (!Object.hasOwn(data, name)) {
+      formatErrors.push(Error(`no data for ${m}`));
+    }
+    return data[name];
+  });
+  if (formatErrors.length > 0) throw AggregateError(formatErrors);
+
+  // Parse the template into DOM nodes for appending to page <head>s (metadata
+  // such as <style> elements) or prepending to page <body>s (everything else).
   // https://html.spec.whatwg.org/multipage/dom.html#metadata-content-2
   const metadataNames =
     'base, link, meta, noscript, script, style, template, title'
       .toUpperCase()
       .split(', ');
-  const template = fs.readFileSync(templateFile, 'utf8');
-  const { default: data } =
-    await import(pathlib.resolve(dataFile), { with: { type: 'json' } });
-  const namePatt = /[{][{]([\p{ID_Start}$_][\p{ID_Continue}$]*)[}][}]/gu;
-  const resolved = template.replaceAll(namePatt, (_, name) => {
-    if (Object.hasOwn(data, name)) return data[name];
-    if (strict) throw Error(`no data for {{${name}}}`);
-    return '';
-  });
+  const insertDom = JSDOM.fragment(resolved);
   const headInserts = [], bodyInserts = [];
-  let insertDom = JSDOM.fragment(resolved);
   for (const node of insertDom.childNodes) {
     if (metadataNames.includes(node.nodeName)) headInserts.push(node);
     else bodyInserts.push(node);
@@ -67,7 +71,7 @@ const main = async (args, options) => {
   if (failures.length > 0) throw AggregateError(failures);
 };
 
-main(cliArgs, cliOpts).catch(err => {
+main(cliArgs).catch(err => {
   console.error(err);
   process.exit(1);
 });

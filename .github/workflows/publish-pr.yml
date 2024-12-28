@@ -85,7 +85,7 @@ jobs:
           }
         ' > "$tmp"
         find result -name '*.html' -exec \
-          node scripts/insert_warning.mjs --strict scripts/pr_preview_warning.html "$tmp" '{}' '+'
+          node scripts/insert_warning.mjs scripts/pr_preview_warning.html "$tmp" '{}' '+'
     - name: Publish to gh-pages
       uses: JamesIves/github-pages-deploy-action@v4.3.3
       with:
