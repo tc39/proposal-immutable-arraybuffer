@@ -13,8 +13,10 @@ jobs:
       with:
         node-version: lts/*
     - run: npm run build
-    - name: Save PR number
-      run: echo ${{ github.event.number }} > build/pr-number.txt
+    - name: Save PR data
+      env:
+        PR: ${{ github.event.number }}
+      run: echo "$PR $(git rev-parse --verify HEAD)" > build/pr-data.txt
     - uses: actions/upload-artifact@v4
       id: upload
       if: ${{ !github.event.repository.fork }}

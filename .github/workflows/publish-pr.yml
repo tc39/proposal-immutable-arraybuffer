@@ -57,23 +57,28 @@ jobs:
       run: rm -rf result && mkdir -p result
     - run: unzip -o result.zip -d result
     - run: ls result
-    - name: Extract PR number
-      id: extract-pr-number
+    - name: Extract PR data
+      id: extract-pr-data
       run: |
         cd result
-        awk -v ok=1 \
-          '{ print; if(!match($0, /^[1-9][0-9]*$/)) ok=0; } END { exit !(NR==1 && ok); }' \
-          pr-number.txt
-        echo "number=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
-        rm pr-number.txt
+        awk -v ok=1 '
+          NR == 1 && match($0, /^[1-9][0-9]* [0-9a-fA-F]{7,}$/) {
+            print "number=" $1;
+            print "commit=" $2;
+            next;
+          }
+          { ok = 0; }
+          END { exit !ok; }
+        ' pr-data.txt >> $GITHUB_OUTPUT
+        rm pr-data.txt
     - name: Insert preview warning
       env:
-        PR: ${{ steps.extract-pr-number.outputs.number }}
+        PR: ${{ steps.extract-pr-data.outputs.number }}
+        COMMIT: ${{ steps.extract-pr-data.outputs.commit }}
       run: |
         tmp="$(mktemp -u XXXXXXXX.json)"
         repo_url="https://github.com/$GITHUB_REPOSITORY"
-        commit="$(git rev-parse --verify HEAD)"
-        jq -n --arg repo_url "$repo_url" --arg PR "$PR" --arg commit "$commit" '
+        jq -n --arg repo_url "$repo_url" --arg PR "$PR" --arg commit "$COMMIT" '
           def repo_link($args): $args as [$path, $contents]
             | ($repo_url + ($path // "")) as $url
             | "<a href=\"\($url | @html)\">\($contents // $url)</a>";
@@ -91,7 +96,7 @@ jobs:
       with:
         branch: gh-pages
         folder: result
-        target-folder: pr/${{ steps.extract-pr-number.outputs.number }}
+        target-folder: pr/${{ steps.extract-pr-data.outputs.number }}
     - name: Determine gh-pages url
       id: get-pages-url
       run: |
@@ -102,7 +107,7 @@ jobs:
       uses: phulsechinmay/rewritable-pr-comment@v0.3.0
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ISSUE_ID: ${{ steps.extract-pr-number.outputs.number }}
+        ISSUE_ID: ${{ steps.extract-pr-data.outputs.number }}
         message: >
           The rendered spec for this PR is available at
-          ${{ steps.get-pages-url.outputs.url }}/pr/${{ steps.extract-pr-number.outputs.number }}.
+          ${{ steps.get-pages-url.outputs.url }}/pr/${{ steps.extract-pr-data.outputs.number }}.
