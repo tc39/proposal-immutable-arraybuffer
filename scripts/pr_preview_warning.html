@@ -56,3 +56,13 @@
     Instead, see {{REPO_LINK}} for the living specification.
   </p>
 </details>
+<script>
+  {
+    const dismissWarnings = evt => {
+      if (evt.code !== 'Escape') return;
+      const close = el => el.open && Object.assign(el, { open: false });
+      document.querySelectorAll('details.annoying-warning').forEach(close);
+    };
+    document.addEventListener('keydown', dismissWarnings, { passive: true });
+  }
+</script>
