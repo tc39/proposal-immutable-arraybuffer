@@ -48,6 +48,11 @@ const main = async args => {
     (node.matches?.('link:not([itemprop])') &&
       [...node.relList].some(rel => !rel.match(bodyOkRelPatt)));
   const insertDom = JSDOM.fragment(resolved);
+  // Node.js v22+:
+  // const { headInserts, bodyInserts } = Object.groupBy(
+  //   insertDom.childNodes,
+  //   node => (forceHead(node) ? 'headInserts' : 'bodyInserts'),
+  // );
   const headInserts = [], bodyInserts = [];
   for (const node of insertDom.childNodes) {
     if (forceHead(node)) headInserts.push(node);
@@ -69,10 +74,8 @@ const main = async args => {
     fs.writeFileSync(file, dom.serialize(), 'utf8');
   }));
 
-  const failures = results.flatMap(result =>
-    result.status === 'fulfilled' ? [] : [result.reason],
-  );
-  if (failures.length > 0) throw AggregateError(failures);
+  const failures = results.filter(result => result.status !== 'fulfilled');
+  if (failures.length > 0) throw AggregateError(failures.map(r => r.reason));
 };
 
 main(cliArgs).catch(err => {
