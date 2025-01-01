@@ -18,7 +18,9 @@
   "devDependencies": {
     "@tc39/ecma262-biblio": "^2.1.2775",
     "ecmarkup": "^20.0.0",
-    "jsdom": "^25.0.1"
+    "jsdom": "^25.0.1",
+    "parse5-html-rewriting-stream": "^7.0.0",
+    "tmp": "^0.2.3"
   },
   "engines": {
     "node": ">= 12"
