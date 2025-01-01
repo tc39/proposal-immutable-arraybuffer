@@ -1,7 +1,10 @@
 import fs from 'node:fs';
 import pathlib from 'node:path';
+import { pipeline } from 'node:stream/promises';
 import { parseArgs } from 'node:util';
-import { JSDOM, VirtualConsole } from 'jsdom';
+import { JSDOM } from 'jsdom';
+import { RewritingStream } from 'parse5-html-rewriting-stream';
+import tmp from 'tmp';
 
 const { positionals: cliArgs } = parseArgs({
   allowPositionals: true,
@@ -12,7 +15,7 @@ if (cliArgs.length < 3) {
   console.error(`Usage: node ${self} <template.html> <data.json> <file.html>...
 
 {{identifier}} substrings in template.html are replaced from data.json, then
-the result is inserted at the start of the body element in each file.html.`);
+the result is inserted into each file.html.`);
   process.exit(64);
 }
 
@@ -21,58 +24,97 @@ const main = async args => {
 
   // Substitute data into the template.
   const template = fs.readFileSync(templateFile, 'utf8');
-  const { default: data } =
-    await import(pathlib.resolve(dataFile), { with: { type: 'json' } });
+  const data = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
   const formatErrors = [];
-  const placeholderPatt = /[{][{](?:([\p{ID_Start}$_][\p{ID_Continue}$]*)[}][}]|.*?(?:[}][}]|(?=[{][{])|$))/gsu;
+  const placeholderPatt =
+    /[{][{](?:([\p{ID_Start}$_][\p{ID_Continue}$]*)[}][}]|.*?(?:[}][}]|(?=[{][{])|$))/gsu;
   const resolved = template.replaceAll(placeholderPatt, (m, name, i) => {
     if (!name) {
       const trunc = m.replace(/([^\n]{29}(?!$)|[^\n]{,29}(?=\n)).*/s, '$1…');
-      formatErrors.push(Error(`bad placeholder at index ${i}: ${trunc}`));
+      formatErrors.push(SyntaxError(`bad placeholder at index ${i}: ${trunc}`));
     } else if (!Object.hasOwn(data, name)) {
-      formatErrors.push(Error(`no data for ${m}`));
+      formatErrors.push(ReferenceError(`no data for ${m}`));
     }
     return data[name];
   });
   if (formatErrors.length > 0) throw AggregateError(formatErrors);
 
-  // Parse the template into DOM nodes for appending to page <head>s (metadata
-  // such as <style> elements) or prepending to page <body>s (everything else).
-  // https://html.spec.whatwg.org/multipage/dom.html#metadata-content-2
-  // https://html.spec.whatwg.org/multipage/semantics.html#allowed-in-the-body
-  // https://html.spec.whatwg.org/multipage/links.html#body-ok
-  const bodyOkRelPatt =
-    /^(?:dns-prefetch|modulepreload|pingback|preconnect|prefetch|preload|stylesheet)$/i;
-  const forceHead = node =>
-    node.matches?.('base, style, title, meta:not([itemprop])') ||
-    (node.matches?.('link:not([itemprop])') &&
-      [...node.relList].some(rel => !rel.match(bodyOkRelPatt)));
-  const insertDom = JSDOM.fragment(resolved);
-  // Node.js v22+:
-  // const { headInserts, bodyInserts } = Object.groupBy(
-  //   insertDom.childNodes,
-  //   node => (forceHead(node) ? 'headInserts' : 'bodyInserts'),
-  // );
-  const headInserts = [], bodyInserts = [];
-  for (const node of insertDom.childNodes) {
-    if (forceHead(node)) headInserts.push(node);
-    else bodyInserts.push(node);
-  }
+  // Parse the template into DOM nodes for appending to page head (metadata such
+  // as <style> elements) or prepending to page body (everything else).
+  const jsdomOpts = { contentType: 'text/html; charset=utf-8' };
+  const { document } = new JSDOM(resolved, jsdomOpts).window;
+  const headHTML = document.head.innerHTML;
+  const bodyHTML = document.body.innerHTML;
 
-  // Perform the insertions, suppressing JSDOM warnings from e.g. unsupported
-  // CSS features.
-  const virtualConsole = new VirtualConsole();
-  virtualConsole.on('error', () => {});
-  const jsdomOpts = { contentType: 'text/html; charset=utf-8', virtualConsole };
-  const getInserts =
-    files.length > 1 ? nodes => nodes.map(n => n.cloneNode(true)) : x => x;
-  const results = await Promise.allSettled(files.map(async file => {
-    let dom = await JSDOM.fromFile(file, jsdomOpts);
-    const { head, body } = dom.window.document;
-    if (headInserts.length > 0) head.append(...getInserts(headInserts));
-    if (bodyInserts.length > 0) body.prepend(...getInserts(bodyInserts));
-    fs.writeFileSync(file, dom.serialize(), 'utf8');
-  }));
+  // Perform the insertions.
+  const work = files.map(async file => {
+    await null;
+    const { name: tmpName, fd, removeCallback } = tmp.fileSync({
+      tmpdir: pathlib.dirname(file),
+      prefix: pathlib.basename(file),
+      postfix: '.tmp',
+      detachDescriptor: true,
+    });
+    try {
+      // Make a pipeline: fileReader -> inserter -> finisher -> fileWriter
+      const fileReader = fs.createReadStream(file, 'utf8');
+      const fileWriter = fs.createWriteStream('', { fd, flush: true });
+
+      // Insert headHTML at the end of a possibly implied head, and bodyHTML at
+      // the beginning of a possibly implied body.
+      // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inhtml
+      let mode = 'before html'; // | 'before head' | 'in head' | 'after head' | '$DONE'
+      const stayInHead = new Set([
+        ...['base', 'basefont', 'bgsound', 'link', 'meta', 'title'],
+        ...['noscript', 'noframes', 'style', 'script', 'template'],
+        'head',
+      ]);
+      const inserter = new RewritingStream();
+      const onEndTag = function (tag) {
+        if (tag.tagName === 'head') {
+          this.emitRaw(headHTML);
+          mode = 'after head';
+        }
+        this.emitEndTag(tag);
+      };
+      const onStartTag = function (tag) {
+        const preserve = () => this.emitStartTag(tag);
+        if (mode === 'before html' && tag.tagName === 'html') {
+          mode = 'before head';
+        } else if (mode !== 'after head' && stayInHead.has(tag.tagName)) {
+          mode = 'in head';
+        } else {
+          if (mode !== 'after head') this.emitRaw(headHTML);
+          // Emit either `${bodyTag}${bodyHTML}` or `${bodyHTML}${otherTag}`.
+          const emits = [preserve, () => this.emitRaw(bodyHTML)];
+          if (tag.tagName !== 'body') emits.reverse();
+          for (const emit of emits) emit();
+          mode = '$DONE';
+          this.removeListener('endTag', onEndTag);
+          this.removeListener('startTag', onStartTag);
+          return;
+        }
+        preserve();
+      };
+      inserter.on('endTag', onEndTag).on('startTag', onStartTag);
+
+      // Ensure headHTML/bodyHTML insertion before EOF.
+      const finisher = async function* (source) {
+        for await (const chunk of source) yield chunk;
+        if (mode === '$DONE') return;
+        if (mode !== 'after head') yield headHTML;
+        yield bodyHTML;
+      };
+
+      await pipeline(fileReader, inserter, finisher, fileWriter);
+
+      // Now that the temp file is complete, overwrite the source file.
+      fs.renameSync(tmpName, file);
+    } finally {
+      removeCallback();
+    }
+  });
+  const results = await Promise.allSettled(work);
 
   const failures = results.filter(result => result.status !== 'fulfilled');
   if (failures.length > 0) throw AggregateError(failures.map(r => r.reason));
