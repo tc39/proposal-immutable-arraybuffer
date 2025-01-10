@@ -12,6 +12,45 @@ shortname: proposal-immutable-arraybuffer
 contributors: Mark S. Miller, Richard Gibson
 </pre>
 
+<emu-clause id="sec-ecmascript-data-types-and-values" number="6">
+  <h1>ECMAScript Data Types and Values</h1>
+
+  <emu-clause id="sec-data-blocks" number="2.9">
+    <h1>Data Blocks</h1>
+    <p>A data block that resides in memory that can be referenced from multiple agents concurrently is designated a <dfn variants="Shared Data Blocks">Shared Data Block</dfn>. A Shared Data Block has an identity (for the purposes of equality testing Shared Data Block values) that is <em>address-free</em>: it is tied not to the virtual addresses the block is mapped to in any process, but to the set of locations in memory that the block represents. Two <del>data blocks</del> <ins>Shared Data Blocks</ins> are equal only if the sets of the locations they contain are equal; otherwise, they are not equal and the intersection of the sets of locations they contain is empty. Finally, Shared Data Blocks can be distinguished from Data Blocks.</p>
+  </emu-clause>
+</emu-clause>
+
+<emu-clause id="sec-operations-on-objects" number="7">
+  <h1>Operations on Objects</h1>
+
+  <ins class="block">
+
+    <emu-clause id="sec-resolvebounds" type="abstract operation">
+      <h1>
+        ResolveBounds (
+          _len_: an integer,
+          _start_: an ECMAScript language value,
+          _end_: an ECMAScript language value,
+        ): either a normal completion containing a Record with fields [[From]] (a non-negative integer) and [[To]] (a non-negative integer) or a throw completion
+      </h1>
+      <dl class="header">
+      </dl>
+      <emu-alg>
+        1. Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).
+        1. If _relativeStart_ = -∞, let _from_ be 0.
+        1. Else if _relativeStart_ &lt; 0, let _from_ be max(_len_ + _relativeStart_, 0).
+        1. Else, let _from_ be min(_relativeStart_, _len_).
+        1. If _end_ is *undefined*, let _relativeEnd_ be _len_; else let _relativeEnd_ be ? ToIntegerOrInfinity(_end_).
+        1. If _relativeEnd_ = -∞, let _to_ be 0.
+        1. Else if _relativeEnd_ &lt; 0, let _to_ be max(_len_ + _relativeEnd_, 0).
+        1. Else, let _to_ be min(_relativeEnd_, _len_).
+        1. Return the Record { [[From]]: _from_, [[To]]: _to_ }.
+      </emu-alg>
+    </emu-clause>
+  </ins>
+</emu-clause>
+
 <emu-clause id="sec-ordinary-and-exotic-objects-behaviours" number="10">
   <h1>Ordinary and Exotic Objects Behaviours</h1>
 
@@ -430,6 +469,36 @@ contributors: Mark S. Miller, Richard Gibson
         </emu-alg>
       </emu-clause>
 
+      <ins class="block">
+
+        <emu-clause id="sec-allocateimmutablearraybuffer" type="abstract operation">
+          <h1>
+            AllocateImmutableArrayBuffer (
+              _constructor_: a constructor,
+              _byteLength_: a non-negative integer,
+              _fromBlock_: a Data Block,
+              _fromIndex_: a non-negative integer,
+              _count_: a non-negative integer,
+            ): either a normal completion containing an ArrayBuffer or a throw completion
+          </h1>
+          <dl class="header">
+            <dt>description</dt>
+            <dd>It is used to create an immutable ArrayBuffer (i.e., an ArrayBuffer with a an [[ArrayBufferIsImmutable]] slot) with contents from _fromBlock_.</dd>
+          </dl>
+          <emu-alg>
+            1. Assert: _constructor_ is %ArrayBuffer%.
+            1. Assert: _count_ ≤ _byteLength_.
+            1. Let _newBuffer_ be ? <emu-meta suppress-effects="user-code">AllocateArrayBuffer(_constructor_, _byteLength_, ~immutable~)</emu-meta>.
+            1. Let _toBlock_ be _newBuffer_.[[ArrayBufferData]].
+            1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, 0, _count_).
+            1. Return _newBuffer_.
+          </emu-alg>
+          <emu-note>
+            <p>Because neither the identity of a Data Block nor the set of locations in memory represented by it are observable, implementations may implement this operation without allocating new memory locations when _fromBlock_ is the value of the [[ArrayBufferData]] slot for some other immutable ArrayBuffer (and therefore already immutable) and _count_ = _byteLength_.</p>
+          </emu-note>
+        </emu-clause>
+      </ins>
+
       <emu-clause id="sec-arraybuffercopyanddetach" type="abstract operation" number="3">
         <h1>
           ArrayBufferCopyAndDetach (
@@ -449,18 +518,19 @@ contributors: Mark S. Miller, Richard Gibson
             1. Let _newByteLength_ be ? ToIndex(_newLength_).
           1. If IsDetachedBuffer(_arrayBuffer_) is *true*, throw a *TypeError* exception.
           1. <ins>If IsImmutableBuffer(_arrayBuffer_) is *true*, throw a *TypeError* exception.</ins>
+          1. <ins>Let _copyLength_ be min(_newByteLength_, _arrayBuffer_.[[ArrayBufferByteLength]]).</ins>
+          1. <ins>If _preserveResizability_ is ~immutable~, then</ins>
+            1. <ins>Return ? AllocateImmutableArrayBuffer(%ArrayBuffer%, _newByteLength_, _arrayBuffer_.[[ArrayBufferData]], 0, _copyLength_).</ins>
           1. If _preserveResizability_ is ~preserve-resizability~ and IsFixedLengthArrayBuffer(_arrayBuffer_) is *false*, then
             1. Let _newMaxByteLength_ be _arrayBuffer_.[[ArrayBufferMaxByteLength]].
-          1. <ins>Else if _preserveResizability_ is ~immutable~, then</ins>
-            1. <ins>Let _newMaxByteLength_ be ~immutable~.</ins>
           1. Else,
             1. Let _newMaxByteLength_ be ~empty~.
           1. If _arrayBuffer_.[[ArrayBufferDetachKey]] is not *undefined*, throw a *TypeError* exception.
           1. Let _newBuffer_ be ? <emu-meta suppress-effects="user-code">AllocateArrayBuffer(%ArrayBuffer%, _newByteLength_, _newMaxByteLength_)</emu-meta>.
-          1. Let _copyLength_ be min(_newByteLength_, _arrayBuffer_.[[ArrayBufferByteLength]]).
+          1. <del>Let _copyLength_ be min(_newByteLength_, _arrayBuffer_.[[ArrayBufferByteLength]]).</del>
           1. Let _fromBlock_ be _arrayBuffer_.[[ArrayBufferData]].
-          1. Let _toBlock_ be _newBuffer_.[[ArrayBufferData]].
           1. <ins>NOTE: This is the only step that can write into the Data Block of an immutable ArrayBuffer.</ins>
+          1. Let _toBlock_ be _newBuffer_.[[ArrayBufferData]].
           1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, 0, _copyLength_).
           1. NOTE: Neither creation of the new Data Block nor copying from the old Data Block are observable. Implementations may implement this method as a zero-copy move or a `realloc`.
           1. Perform ! DetachArrayBuffer(_arrayBuffer_).
@@ -606,14 +676,17 @@ contributors: Mark S. Miller, Richard Gibson
           1. If IsSharedArrayBuffer(_O_) is *true*, throw a *TypeError* exception.
           1. If IsDetachedBuffer(_O_) is *true*, throw a *TypeError* exception.
           1. Let _len_ be _O_.[[ArrayBufferByteLength]].
-          1. Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).
-          1. If _relativeStart_ = -∞, let _first_ be 0.
-          1. Else if _relativeStart_ &lt; 0, let _first_ be max(_len_ + _relativeStart_, 0).
-          1. Else, let _first_ be min(_relativeStart_, _len_).
-          1. If _end_ is *undefined*, let _relativeEnd_ be _len_; else let _relativeEnd_ be ? ToIntegerOrInfinity(_end_).
-          1. If _relativeEnd_ = -∞, let _final_ be 0.
-          1. Else if _relativeEnd_ &lt; 0, let _final_ be max(_len_ + _relativeEnd_, 0).
-          1. Else, let _final_ be min(_relativeEnd_, _len_).
+          1. <del>Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).</del>
+          1. <del>If _relativeStart_ = -∞, let _first_ be 0.</del>
+          1. <del>Else if _relativeStart_ &lt; 0, let _first_ be max(_len_ + _relativeStart_, 0).</del>
+          1. <del>Else, let _first_ be min(_relativeStart_, _len_).</del>
+          1. <del>If _end_ is *undefined*, let _relativeEnd_ be _len_; else let _relativeEnd_ be ? ToIntegerOrInfinity(_end_).</del>
+          1. <del>If _relativeEnd_ = -∞, let _final_ be 0.</del>
+          1. <del>Else if _relativeEnd_ &lt; 0, let _final_ be max(_len_ + _relativeEnd_, 0).</del>
+          1. <del>Else, let _final_ be min(_relativeEnd_, _len_).</del>
+          1. <ins>Let _bounds_ be ? ResolveBounds(_len_, _start_, _end_).</ins>
+          1. <ins>Let _first_ be _bounds_.[[From]].</ins>
+          1. <ins>Let _final_ be _bounds_.[[To]].</ins>
           1. Let _newLen_ be max(_final_ - _first_, 0).
           1. Let _ctor_ be ? SpeciesConstructor(_O_, %ArrayBuffer%).
           1. Let _new_ be ? Construct(_ctor_, « 𝔽(_newLen_) »).
@@ -634,6 +707,33 @@ contributors: Mark S. Miller, Richard Gibson
           1. Return _new_.
         </emu-alg>
       </emu-clause>
+
+      <ins class="block">
+
+        <emu-clause id="sec-arraybuffer.prototype.slicetoimmutable">
+          <h1>ArrayBuffer.prototype.sliceToImmutable ( _start_, _end_ )</h1>
+          <p>This method performs the following steps when called:</p>
+          <emu-alg>
+            1. Let _O_ be the *this* value.
+            1. Perform ? RequireInternalSlot(_O_, [[ArrayBufferData]]).
+            1. If IsSharedArrayBuffer(_O_) is *true*, throw a *TypeError* exception.
+            1. TODO: Confirm inclusion of this redundant check.
+            1. If IsDetachedBuffer(_O_) is *true*, throw a *TypeError* exception.
+            1. Let _len_ be _O_.[[ArrayBufferByteLength]].
+            1. Let _bounds_ be ? ResolveBounds(_len_, _start_, _end_).
+            1. Let _first_ be _bounds_.[[From]].
+            1. Let _final_ be _bounds_.[[To]].
+            1. TODO: Confirm this strictness vs. the conventional `max(_final_ - _first_, 0)`.
+            1. Let _newLen_ be _final_ - _first_.
+            1. If _newLen_ &lt; 0, throw a *RangeError* exception.
+            1. Let _copyLen_ be min(_newLen_, _len_).
+            1. NOTE: Side-effects of the above steps may have detached or resized _O_. This algorithm proceeds only when _O_ is not detached, even if _newLen_ is 0.
+            1. If IsDetachedBuffer(_O_) is *true*, throw a *TypeError* exception.
+            1. Let _newBuffer_ be ? AllocateImmutableArrayBuffer(%ArrayBuffer%, _newLen_, _O_.[[ArrayBufferData]], _first_, _copyLen_).
+            1. Return _newBuffer_.
+          </emu-alg>
+        </emu-clause>
+      </ins>
 
       <ins class="block">
 
