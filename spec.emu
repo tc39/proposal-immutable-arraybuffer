@@ -105,8 +105,11 @@ contributors: Mark S. Miller, Richard Gibson
               1. If _Desc_ has an [[Enumerable]] field and _Desc_.[[Enumerable]] is *false*, return *false*.
               1. If IsAccessorDescriptor(_Desc_) is *true*, return *false*.
               1. If _Desc_ has a [[Writable]] field and _Desc_.[[Writable]] is <del>*false*</del> <ins>not _mutable_</ins>, return *false*.
-              1. <ins>If _Desc_ has a [[Value]] field and _mutable_ is *false* and SameValue(_Desc_.[[Value]], TypedArrayGetElement(_O_, _numericIndex_)) is *false*, return *false*.</ins>
-              1. If _Desc_ has a [[Value]] field <ins>and _mutable_ is *true*</ins>, perform ? TypedArraySetElement(_O_, _numericIndex_, _Desc_.[[Value]]).
+              1. <del>If _Desc_ has a [[Value]] field, perform ? TypedArraySetElement(_O_, _numericIndex_, _Desc_.[[Value]]).</del>
+              1. <ins>If _Desc_ has a [[Value]] field, then</ins>
+                1. <ins>NOTE: Attempting to redefine an immutable value always fails, even if the new value would be cast to the current value.</ins>
+                1. <ins>If _mutable_ is *false* and SameValue(_Desc_.[[Value]], TypedArrayGetElement(_O_, _numericIndex_)) is *false*, return *false*.</ins>
+                1. <ins>If _mutable_ is *true*, perform ? TypedArraySetElement(_O_, _numericIndex_, _Desc_.[[Value]]).</ins>
               1. Return *true*.
           1. Return ! OrdinaryDefineOwnProperty(_O_, _P_, _Desc_).
         </emu-alg>
