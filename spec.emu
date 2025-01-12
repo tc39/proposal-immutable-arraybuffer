@@ -131,8 +131,9 @@ contributors: Mark S. Miller, Richard Gibson
           1. If _P_ is a String, then
             1. Let _numericIndex_ be CanonicalNumericIndexString(_P_).
             1. If _numericIndex_ is not *undefined*, then
+              1. <ins>NOTE: TypedArray instances restrict own and inherited canonical numeric string properties to integer indices valid for their backing buffers, but assignment failures for canonical numeric string properties are only reported when the buffer is immutable.</ins>
+              1. <ins>If IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, return *false*.</ins>
               1. If SameValue(_O_, _Receiver_) is *true*, then
-                1. <ins>IsValidIntegerIndex(_O_, _numericIndex_) is *true* and IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, return *false*.</ins>
                 1. Perform ? TypedArraySetElement(_O_, _numericIndex_, _V_).
                 1. Return *true*.
               1. If IsValidIntegerIndex(_O_, _numericIndex_) is *false*, return *true*.
@@ -151,9 +152,10 @@ contributors: Mark S. Miller, Richard Gibson
         <dl class="header">
         </dl>
         <emu-alg>
+          1. <ins>Assert: IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *false*.</ins>
           1. If _O_.[[ContentType]] is ~bigint~, let _numValue_ be ? ToBigInt(_value_).
           1. Otherwise, let _numValue_ be ? ToNumber(_value_).
-          1. If IsValidIntegerIndex(_O_, _index_) is *true* <ins>and IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *false*</ins>, then
+          1. If IsValidIntegerIndex(_O_, _index_) is *true*, then
             1. Let _offset_ be _O_.[[ByteOffset]].
             1. Let _elementSize_ be TypedArrayElementSize(_O_).
             1. Let _byteIndexInBuffer_ be (ℝ(_index_) × _elementSize_) + _offset_.
@@ -162,7 +164,7 @@ contributors: Mark S. Miller, Richard Gibson
           1. Return ~unused~.
         </emu-alg>
         <emu-note>
-          <p>This operation always appears to succeed, but it has no effect when attempting to write past the end of a TypedArray or to a TypedArray which is backed by a detached <ins>or immutable</ins> ArrayBuffer.</p>
+          <p>This operation always appears to succeed, but it has no effect when attempting to write past the end of a TypedArray or to a TypedArray which is backed by a detached ArrayBuffer.</p>
         </emu-note>
       </emu-clause>
     </emu-clause>
