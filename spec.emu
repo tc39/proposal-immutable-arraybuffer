@@ -491,7 +491,7 @@ contributors: Mark S. Miller, Richard Gibson
             1. Let _newBuffer_ be ? <emu-meta suppress-effects="user-code">AllocateArrayBuffer(_constructor_, _byteLength_, ~immutable~)</emu-meta>.
             1. Let _toBlock_ be _newBuffer_.[[ArrayBufferData]].
             1. NOTE: This is the only step that can write into the Data Block of an immutable ArrayBuffer.
-            1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, 0, _count_).
+            1. Perform CopyDataBlockBytes(_toBlock_, 0, _fromBlock_, _fromIndex_, _count_).
             1. Return _newBuffer_.
           </emu-alg>
           <emu-note>
