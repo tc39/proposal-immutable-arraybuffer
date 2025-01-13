@@ -293,7 +293,7 @@ contributors: Mark S. Miller, Richard Gibson
         <p>It performs the following steps when called:</p>
         <emu-alg>
           1. Let _target_ be the *this* value.
-          1. <ins>NOTE: `Let _taRecord_ be ? ValidateTypedArray(_O_, ~seq-cst~<ins>, ~write~</ins>).` here would observably change the observable calls into user code and thrown error when IsTypedArrayOutOfBounds returns *true* and _offset_ is negative. Such a change should be pursued.</ins>
+          1. <ins>NOTE: The following steps could be simplified by using ? ValidateTypedArray(_target_, ~seq-cst~, ~write~) and refactoring SetTypedArrayFromTypedArray and SetTypedArrayFromArrayLike to accept the result as input, but that would observably change the calls into user code and thrown error when IsTypedArrayOutOfBounds returns *true* and _offset_ is negative. Regardless, such a change is still worth pursuing if possible.</ins>
           1. Perform ? RequireInternalSlot(_target_, [[TypedArrayName]]).
           1. Assert: _target_ has a [[ViewedArrayBuffer]] internal slot.
           1. <ins>If IsImmutableBuffer(_target_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
