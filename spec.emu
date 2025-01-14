@@ -105,8 +105,11 @@ contributors: Mark S. Miller, Richard Gibson
               1. If _Desc_ has an [[Enumerable]] field and _Desc_.[[Enumerable]] is *false*, return *false*.
               1. If IsAccessorDescriptor(_Desc_) is *true*, return *false*.
               1. If _Desc_ has a [[Writable]] field and _Desc_.[[Writable]] is <del>*false*</del> <ins>not _mutable_</ins>, return *false*.
-              1. <ins>If _Desc_ has a [[Value]] field and _mutable_ is *false* and SameValue(_Desc_.[[Value]], TypedArrayGetElement(_O_, _numericIndex_)) is *false*, return *false*.</ins>
-              1. If _Desc_ has a [[Value]] field <ins>and _mutable_ is *true*</ins>, perform ? TypedArraySetElement(_O_, _numericIndex_, _Desc_.[[Value]]).
+              1. <del>If _Desc_ has a [[Value]] field, perform ? TypedArraySetElement(_O_, _numericIndex_, _Desc_.[[Value]]).</del>
+              1. <ins>If _Desc_ has a [[Value]] field, then</ins>
+                1. <ins>NOTE: Attempting to redefine an immutable value always fails, even if the new value would be cast to the current value.</ins>
+                1. <ins>If _mutable_ is *false* and SameValue(_Desc_.[[Value]], TypedArrayGetElement(_O_, _numericIndex_)) is *false*, return *false*.</ins>
+                1. <ins>If _mutable_ is *true*, perform ? TypedArraySetElement(_O_, _numericIndex_, _Desc_.[[Value]]).</ins>
               1. Return *true*.
           1. Return ! OrdinaryDefineOwnProperty(_O_, _P_, _Desc_).
         </emu-alg>
@@ -128,8 +131,9 @@ contributors: Mark S. Miller, Richard Gibson
           1. If _P_ is a String, then
             1. Let _numericIndex_ be CanonicalNumericIndexString(_P_).
             1. If _numericIndex_ is not *undefined*, then
+              1. <ins>NOTE: TypedArray instances restrict own and inherited canonical numeric string properties to integer indices valid for their backing buffers, but assignment failures for canonical numeric string properties are only reported when the buffer is immutable.</ins>
+              1. <ins>If IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, return *false*.</ins>
               1. If SameValue(_O_, _Receiver_) is *true*, then
-                1. <ins>IsValidIntegerIndex(_O_, _numericIndex_) is *true* and IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, return *false*.</ins>
                 1. Perform ? TypedArraySetElement(_O_, _numericIndex_, _V_).
                 1. Return *true*.
               1. If IsValidIntegerIndex(_O_, _numericIndex_) is *false*, return *true*.
@@ -148,9 +152,10 @@ contributors: Mark S. Miller, Richard Gibson
         <dl class="header">
         </dl>
         <emu-alg>
+          1. <ins>Assert: IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *false*.</ins>
           1. If _O_.[[ContentType]] is ~bigint~, let _numValue_ be ? ToBigInt(_value_).
           1. Otherwise, let _numValue_ be ? ToNumber(_value_).
-          1. If IsValidIntegerIndex(_O_, _index_) is *true* <ins>and IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *false*</ins>, then
+          1. If IsValidIntegerIndex(_O_, _index_) is *true*, then
             1. Let _offset_ be _O_.[[ByteOffset]].
             1. Let _elementSize_ be TypedArrayElementSize(_O_).
             1. Let _byteIndexInBuffer_ be (ℝ(_index_) × _elementSize_) + _offset_.
@@ -159,7 +164,7 @@ contributors: Mark S. Miller, Richard Gibson
           1. Return ~unused~.
         </emu-alg>
         <emu-note>
-          <p>This operation always appears to succeed, but it has no effect when attempting to write past the end of a TypedArray or to a TypedArray which is backed by a detached <ins>or immutable</ins> ArrayBuffer.</p>
+          <p>This operation always appears to succeed, but it has no effect when attempting to write past the end of a TypedArray or to a TypedArray which is backed by a detached ArrayBuffer.</p>
         </emu-note>
       </emu-clause>
     </emu-clause>
@@ -284,95 +289,23 @@ contributors: Mark S. Miller, Richard Gibson
 
       <emu-clause id="sec-%typedarray%.prototype.set" oldids="sec-%typedarray%.prototype.set-overloaded-offset" number="26">
         <h1>%TypedArray%.prototype.set ( _source_ [ , _offset_ ] )</h1>
-
-        <emu-clause id="sec-settypedarrayfromtypedarray" type="abstract operation" oldids="sec-%typedarray%.prototype.set-typedarray-offset">
-          <h1>
-            SetTypedArrayFromTypedArray (
-              _target_: a TypedArray,
-              _targetOffset_: a non-negative integer or +&infin;,
-              _source_: a TypedArray,
-            ): either a normal completion containing ~unused~ or a throw completion
-          </h1>
-          <dl class="header">
-            <dt>description</dt>
-            <dd>It sets multiple values in _target_, starting at index _targetOffset_, reading the values from _source_.</dd>
-          </dl>
-          <emu-alg>
-            1. Let _targetBuffer_ be _target_.[[ViewedArrayBuffer]].
-            1. Let _targetRecord_ be MakeTypedArrayWithBufferWitnessRecord(_target_, ~seq-cst~).
-            1. If IsTypedArrayOutOfBounds(_targetRecord_) is *true*, throw a *TypeError* exception.
-            1. <ins>If IsImmutableBuffer(_target_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
-            1. Let _targetLength_ be TypedArrayLength(_targetRecord_).
-            1. Let _srcBuffer_ be _source_.[[ViewedArrayBuffer]].
-            1. Let _srcRecord_ be MakeTypedArrayWithBufferWitnessRecord(_source_, ~seq-cst~).
-            1. If IsTypedArrayOutOfBounds(_srcRecord_) is *true*, throw a *TypeError* exception.
-            1. Let _srcLength_ be TypedArrayLength(_srcRecord_).
-            1. Let _targetType_ be TypedArrayElementType(_target_).
-            1. Let _targetElementSize_ be TypedArrayElementSize(_target_).
-            1. Let _targetByteOffset_ be _target_.[[ByteOffset]].
-            1. Let _srcType_ be TypedArrayElementType(_source_).
-            1. Let _srcElementSize_ be TypedArrayElementSize(_source_).
-            1. Let _srcByteOffset_ be _source_.[[ByteOffset]].
-            1. If _targetOffset_ = +∞, throw a *RangeError* exception.
-            1. If _srcLength_ + _targetOffset_ > _targetLength_, throw a *RangeError* exception.
-            1. If _target_.[[ContentType]] is not _source_.[[ContentType]], throw a *TypeError* exception.
-            1. If IsSharedArrayBuffer(_srcBuffer_) is *true*, IsSharedArrayBuffer(_targetBuffer_) is *true*, and _srcBuffer_.[[ArrayBufferData]] is _targetBuffer_.[[ArrayBufferData]], let _sameSharedArrayBuffer_ be *true*; otherwise, let _sameSharedArrayBuffer_ be *false*.
-            1. If SameValue(_srcBuffer_, _targetBuffer_) is *true* or _sameSharedArrayBuffer_ is *true*, then
-              1. Let _srcByteLength_ be TypedArrayByteLength(_srcRecord_).
-              1. Set _srcBuffer_ to ? CloneArrayBuffer(_srcBuffer_, _srcByteOffset_, _srcByteLength_).
-              1. Let _srcByteIndex_ be 0.
-            1. Else,
-              1. Let _srcByteIndex_ be _srcByteOffset_.
-            1. Let _targetByteIndex_ be (_targetOffset_ × _targetElementSize_) + _targetByteOffset_.
-            1. Let _limit_ be _targetByteIndex_ + (_targetElementSize_ × _srcLength_).
-            1. If _srcType_ is _targetType_, then
-              1. NOTE: The transfer must be performed in a manner that preserves the bit-level encoding of the source data.
-              1. Repeat, while _targetByteIndex_ &lt; _limit_,
-                1. Let _value_ be GetValueFromBuffer(_srcBuffer_, _srcByteIndex_, ~uint8~, *true*, ~unordered~).
-                1. Perform SetValueInBuffer(_targetBuffer_, _targetByteIndex_, ~uint8~, _value_, *true*, ~unordered~).
-                1. Set _srcByteIndex_ to _srcByteIndex_ + 1.
-                1. Set _targetByteIndex_ to _targetByteIndex_ + 1.
-            1. Else,
-              1. Repeat, while _targetByteIndex_ &lt; _limit_,
-                1. Let _value_ be GetValueFromBuffer(_srcBuffer_, _srcByteIndex_, _srcType_, *true*, ~unordered~).
-                1. Perform SetValueInBuffer(_targetBuffer_, _targetByteIndex_, _targetType_, _value_, *true*, ~unordered~).
-                1. Set _srcByteIndex_ to _srcByteIndex_ + _srcElementSize_.
-                1. Set _targetByteIndex_ to _targetByteIndex_ + _targetElementSize_.
-            1. Return ~unused~.
-          </emu-alg>
-        </emu-clause>
-
-        <emu-clause id="sec-settypedarrayfromarraylike" type="abstract operation" oldids="sec-%typedarray%.prototype.set-array-offset">
-          <h1>
-            SetTypedArrayFromArrayLike (
-              _target_: a TypedArray,
-              _targetOffset_: a non-negative integer or +&infin;,
-              _source_: an ECMAScript language value, but not a TypedArray,
-            ): either a normal completion containing ~unused~ or a throw completion
-          </h1>
-          <dl class="header">
-            <dt>description</dt>
-            <dd>It sets multiple values in _target_, starting at index _targetOffset_, reading the values from _source_.</dd>
-          </dl>
-          <emu-alg>
-            1. Let _targetRecord_ be MakeTypedArrayWithBufferWitnessRecord(_target_, ~seq-cst~).
-            1. If IsTypedArrayOutOfBounds(_targetRecord_) is *true*, throw a *TypeError* exception.
-            1. <ins>If IsImmutableBuffer(_target_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
-            1. Let _targetLength_ be TypedArrayLength(_targetRecord_).
-            1. Let _src_ be ? ToObject(_source_).
-            1. Let _srcLength_ be ? LengthOfArrayLike(_src_).
-            1. If _targetOffset_ = +∞, throw a *RangeError* exception.
-            1. If _srcLength_ + _targetOffset_ > _targetLength_, throw a *RangeError* exception.
-            1. Let _k_ be 0.
-            1. Repeat, while _k_ &lt; _srcLength_,
-              1. Let _Pk_ be ! ToString(𝔽(_k_)).
-              1. Let _value_ be ? Get(_src_, _Pk_).
-              1. Let _targetIndex_ be 𝔽(_targetOffset_ + _k_).
-              1. Perform ? TypedArraySetElement(_target_, _targetIndex_, _value_).
-              1. Set _k_ to _k_ + 1.
-            1. Return ~unused~.
-          </emu-alg>
-        </emu-clause>
+        <p>This method sets multiple values in this _TypedArray_, reading the values from _source_. The details differ based upon the type of _source_. The optional _offset_ value indicates the first element index in this _TypedArray_ where values are written. If omitted, it is assumed to be 0.</p>
+        <p>It performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _target_ be the *this* value.
+          1. <ins>NOTE: The following steps could be simplified by using ? ValidateTypedArray(_target_, ~seq-cst~, ~write~) and refactoring SetTypedArrayFromTypedArray and SetTypedArrayFromArrayLike to accept the result as input, but that would observably change the calls into user code and thrown error when IsTypedArrayOutOfBounds returns *true* and _offset_ is negative. Regardless, such a change is still worth pursuing if possible.</ins>
+          1. Perform ? RequireInternalSlot(_target_, [[TypedArrayName]]).
+          1. Assert: _target_ has a [[ViewedArrayBuffer]] internal slot.
+          1. <ins>If IsImmutableBuffer(_target_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
+          1. Let _targetOffset_ be ? ToIntegerOrInfinity(_offset_).
+          1. If _targetOffset_ &lt; 0, throw a *RangeError* exception.
+          1. If _source_ is an Object that has a [[TypedArrayName]] internal slot, then
+            1. Perform ? SetTypedArrayFromTypedArray(_target_, _targetOffset_, _source_).
+          1. Else,
+            1. Perform ? SetTypedArrayFromArrayLike(_target_, _targetOffset_, _source_).
+          1. Return *undefined*.
+        </emu-alg>
+        <p>This method is not generic. The *this* value must be an object with a [[TypedArrayName]] internal slot.</p>
       </emu-clause>
 
       <emu-clause id="sec-%typedarray%.prototype.sort" oldids="sec-typedarraysortcompare" number="29">
