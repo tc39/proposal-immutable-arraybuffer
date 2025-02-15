@@ -657,7 +657,7 @@ contributors: Mark S. Miller, Richard Gibson
             1. Let _first_ be _bounds_.[[From]].
             1. Let _final_ be _bounds_.[[To]].
             1. Let _newLen_ be _final_ - _first_.
-            1. TODO: Confirm this strictness vs. `slice` (rejecting negative _newLen_ rather than clamping to 0).
+            1. NOTE: This differs from <emu-xref href="#sec-arraybuffer.prototype.slice" title></emu-xref>, which instead clamps _newLen_ to be non-negative.
             1. If _newLen_ &lt; 0, throw a *RangeError* exception.
             1. NOTE: Side-effects of the above steps may have detached or resized _O_.
             1. If IsDetachedBuffer(_O_) is *true*, throw a *TypeError* exception.
