@@ -342,16 +342,16 @@ contributors: Mark S. Miller, Richard Gibson
           ValidateTypedArray (
             _O_: an ECMAScript language value,
             _order_: ~seq-cst~ or ~unordered~,
-            <ins>optional _use_: ~read~ or ~write~,</ins>
+            <ins>optional _accessMode_: ~read~ or ~write~,</ins>
           ): either a normal completion containing a TypedArray With Buffer Witness Record or a throw completion
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. <ins>If _use_ is not present, set _use_ to ~read~.</ins>
+          1. <ins>If _accessMode_ is not present, set _accessMode_ to ~read~.</ins>
           1. Perform ? RequireInternalSlot(_O_, [[TypedArrayName]]).
           1. Assert: _O_ has a [[ViewedArrayBuffer]] internal slot.
-          1. <ins>If _use_ is ~write~ and IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
+          1. <ins>If _accessMode_ is ~write~ and IsImmutableBuffer(_O_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
           1. Let _taRecord_ be MakeTypedArrayWithBufferWitnessRecord(_O_, _order_).
           1. If IsTypedArrayOutOfBounds(_taRecord_) is *true*, throw a *TypeError* exception.
           1. Return _taRecord_.
@@ -375,13 +375,14 @@ contributors: Mark S. Miller, Richard Gibson
           AllocateArrayBuffer (
             _constructor_: a constructor,
             _byteLength_: a non-negative integer,
-            optional _maxByteLength_: a non-negative integer, or either ~empty~ or ~immutable~,
+            optional _maxByteLength_: a non-negative integer, <del>or ~empty~</del> <ins>or either ~empty~ or ~immutable~</ins>,
           ): either a normal completion containing an ArrayBuffer or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
           <dd>It is used to create an ArrayBuffer.</dd>
         </dl>
+        <emu-note type="editor">The current name and domain of parameter _maxByteLength_ is preserved for the benefit of diff readability, but both may be subject to change before acceptance into ECMA-262.</emu-note>
         <emu-alg>
           1. Let _slots_ be « [[ArrayBufferData]], [[ArrayBufferByteLength]], [[ArrayBufferDetachKey]] ».
           1. If _maxByteLength_ is present and _maxByteLength_ is <del>not ~empty~</del> <ins>an integer</ins>, let _allocatingResizableBuffer_ be *true*; otherwise let _allocatingResizableBuffer_ be *false*.
@@ -744,14 +745,14 @@ contributors: Mark S. Miller, Richard Gibson
           ValidateIntegerTypedArray (
             _typedArray_: an ECMAScript language value,
             _waitable_: a Boolean,
-            <ins>optional _use_: ~read~ or ~write~,</ins>
+            <ins>optional _accessMode_: ~read~ or ~write~,</ins>
           ): either a normal completion containing a TypedArray With Buffer Witness Record, or a throw completion
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. <ins>If _use_ is not present, set _use_ to ~read~.</ins>
-          1. Let _taRecord_ be ? ValidateTypedArray(_typedArray_, ~unordered~<ins>, _use_</ins>).
+          1. <ins>If _accessMode_ is not present, set _accessMode_ to ~read~.</ins>
+          1. Let _taRecord_ be ? ValidateTypedArray(_typedArray_, ~unordered~<ins>, _accessMode_</ins>).
           1. NOTE: Bounds checking is not a synchronizing operation when _typedArray_'s backing buffer is a growable SharedArrayBuffer.
           1. If _waitable_ is *true*, then
             1. If _typedArray_.[[TypedArrayName]] is neither *"Int32Array"* nor *"BigInt64Array"*, throw a *TypeError* exception.
@@ -768,15 +769,15 @@ contributors: Mark S. Miller, Richard Gibson
             _typedArray_: an ECMAScript language value,
             _requestIndex_: an ECMAScript language value,
             optional _waitable_: a Boolean,
-            <ins>optional _use_: ~read~ or ~write~,</ins>
+            <ins>optional _accessMode_: ~read~ or ~write~,</ins>
           ): either a normal completion containing an integer or a throw completion
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
           1. If _waitable_ is not present, set _waitable_ to *false*.
-          1. <ins>If _use_ is not present, set _use_ to ~read~.</ins>
-          1. Let _taRecord_ be ? ValidateIntegerTypedArray(_typedArray_, _waitable_<ins>, _use_</ins>).
+          1. <ins>If _accessMode_ is not present, set _accessMode_ to ~read~.</ins>
+          1. Let _taRecord_ be ? ValidateIntegerTypedArray(_typedArray_, _waitable_<ins>, _accessMode_</ins>).
           1. Return ? ValidateAtomicAccess(_taRecord_, _requestIndex_).
         </emu-alg>
       </emu-clause>
