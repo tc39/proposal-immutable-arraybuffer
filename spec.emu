@@ -439,11 +439,12 @@ contributors: Mark S. Miller, Richard Gibson
           ArrayBufferCopyAndDetach (
             _arrayBuffer_: an ECMAScript language value,
             _newLength_: an ECMAScript language value,
-            _preserveResizability_: ~preserve-resizability~, ~fixed-length~, or ~immutable~,
+            _preserveResizability_: ~preserve-resizability~, ~fixed-length~, or <ins>~immutable~</ins>,
           ): either a normal completion containing an ArrayBuffer or a throw completion
         </h1>
         <dl class="header">
         </dl>
+        <emu-note type="editor">The current name of parameter _preserveResizability_ is preserved for the benefit of diff readability, but may be subject to change (to e.g. _mode_) before acceptance into ECMA-262.</emu-note>
         <emu-alg>
           1. Perform ? RequireInternalSlot(_arrayBuffer_, [[ArrayBufferData]]).
           1. If IsSharedArrayBuffer(_arrayBuffer_) is *true*, throw a *TypeError* exception.
