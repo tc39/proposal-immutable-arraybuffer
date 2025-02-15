@@ -375,13 +375,14 @@ contributors: Mark S. Miller, Richard Gibson
           AllocateArrayBuffer (
             _constructor_: a constructor,
             _byteLength_: a non-negative integer,
-            optional _maxByteLength_: a non-negative integer, or either ~empty~ or ~immutable~,
+            optional _maxByteLength_: a non-negative integer, <del>or ~empty~</del> <ins>or either ~empty~ or ~immutable~</ins>,
           ): either a normal completion containing an ArrayBuffer or a throw completion
         </h1>
         <dl class="header">
           <dt>description</dt>
           <dd>It is used to create an ArrayBuffer.</dd>
         </dl>
+        <emu-note type="editor">The current name and domain of parameter _maxByteLength_ is preserved for the benefit of diff readability, but both may be subject to change before acceptance into ECMA-262.</emu-note>
         <emu-alg>
           1. Let _slots_ be « [[ArrayBufferData]], [[ArrayBufferByteLength]], [[ArrayBufferDetachKey]] ».
           1. If _maxByteLength_ is present and _maxByteLength_ is <del>not ~empty~</del> <ins>an integer</ins>, let _allocatingResizableBuffer_ be *true*; otherwise let _allocatingResizableBuffer_ be *false*.
