@@ -492,6 +492,31 @@ contributors: Mark S. Miller, Richard Gibson
         </emu-clause>
       </ins>
 
+      <emu-clause id="sec-detacharraybuffer" type="abstract operation" number="5">
+        <h1>
+          DetachArrayBuffer (
+            _arrayBuffer_: an ArrayBuffer,
+            optional _key_: anything,
+          ): either a normal completion containing ~unused~ or a throw completion
+        </h1>
+        <dl class="header">
+          <dt>skip global checks</dt>
+          <dd>true</dd>
+        </dl>
+        <emu-alg>
+          1. Assert: IsSharedArrayBuffer(_arrayBuffer_) is *false*.
+          1. If _key_ is not present, set _key_ to *undefined*.
+          1. If _arrayBuffer_.[[ArrayBufferDetachKey]] is not _key_, throw a *TypeError* exception.
+          1. <ins>If IsImmutableBuffer(_arrayBuffer_) is *true*, throw a *TypeError* exception.</ins>
+          1. Set _arrayBuffer_.[[ArrayBufferData]] to *null*.
+          1. Set _arrayBuffer_.[[ArrayBufferByteLength]] to 0.
+          1. Return ~unused~.
+        </emu-alg>
+        <emu-note>
+          <p>Detaching an ArrayBuffer instance disassociates the Data Block used as its backing store from the instance and sets the byte length of the buffer to 0.</p>
+        </emu-note>
+      </emu-clause>
+
       <emu-clause id="sec-setvalueinbuffer" type="abstract operation" number="18">
         <h1>
           SetValueInBuffer (
