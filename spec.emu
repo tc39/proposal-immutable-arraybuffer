@@ -717,6 +717,7 @@ contributors: Mark S. Miller, Richard Gibson
         <emu-alg>
           1. Perform ? RequireInternalSlot(_view_, [[DataView]]).
           1. Assert: _view_ has a [[ViewedArrayBuffer]] internal slot.
+          1. <ins>If IsImmutableBuffer(_view_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
           1. Let _getIndex_ be ? ToIndex(_requestIndex_).
           1. If IsBigIntElementType(_type_) is *true*, let _numberValue_ be ? ToBigInt(_value_).
           1. Otherwise, let _numberValue_ be ? ToNumber(_value_).
@@ -725,7 +726,6 @@ contributors: Mark S. Miller, Richard Gibson
           1. Let _viewRecord_ be MakeDataViewWithBufferWitnessRecord(_view_, ~unordered~).
           1. NOTE: Bounds checking is not a synchronizing operation when _view_'s backing buffer is a growable SharedArrayBuffer.
           1. If IsViewOutOfBounds(_viewRecord_) is *true*, throw a *TypeError* exception.
-          1. <ins>If IsImmutableBuffer(_view_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
           1. Let _viewSize_ be GetViewByteLength(_viewRecord_).
           1. Let _elementSize_ be the Element Size value specified in <emu-xref href="#table-the-typedarray-constructors"></emu-xref> for Element Type _type_.
           1. If _getIndex_ + _elementSize_ > _viewSize_, throw a *RangeError* exception.
