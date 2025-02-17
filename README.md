@@ -70,6 +70,7 @@ web transport [issue #131](https://github.com/w3c/webtransport/issues/131#issuec
   - [unlikely](https://github.com/w3c/webtransport/issues/131#issuecomment-2662013436) because Chrome (and likely others) copy when crossing address spaces. But see [Even when talking between different processes, each with their own address space, for a huge enough buffer ...](https://github.com/tc39/proposal-immutable-arraybuffer/issues/30#issuecomment-2652223749)
 
 whatwg streams [issue #495](https://github.com/whatwg/streams/issues/495#issuecomment-2560361444)
+  - [unlikely](https://github.com/whatwg/streams/issues/495#issuecomment-2662375750) because, well, they are streams, not buffers.
 
 w3c machine learning workshop [issue #93](https://github.com/w3c/machine-learning-workshop/issues/93#issuecomment-2560365962)
 
