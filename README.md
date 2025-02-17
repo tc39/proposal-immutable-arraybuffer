@@ -67,7 +67,7 @@ webidl [Frozen Array](https://webidl.spec.whatwg.org/#idl-frozen-array)
 webcodecs [issue #80](https://github.com/w3c/webcodecs/issues/80#issuecomment-2560331900), [issue #104](https://github.com/w3c/webcodecs/issues/104#issuecomment-2560334782), and [issue #212](https://github.com/w3c/webcodecs/issues/212#issuecomment-2560348504)
 
 web transport [issue #131](https://github.com/w3c/webtransport/issues/131#issuecomment-2560357416) 
-  - [no](https://github.com/w3c/webtransport/issues/131#issuecomment-2561160533) because Chrome (and likely others) copy when crossing address spaces. But see [Even when talking between different processes, each with their own address space, for a huge enough buffer ...](https://github.com/tc39/proposal-immutable-arraybuffer/issues/30#issuecomment-2652223749)
+  - [unlikely](https://github.com/w3c/webtransport/issues/131#issuecomment-2662013436) because Chrome (and likely others) copy when crossing address spaces. But see [Even when talking between different processes, each with their own address space, for a huge enough buffer ...](https://github.com/tc39/proposal-immutable-arraybuffer/issues/30#issuecomment-2652223749)
 
 whatwg streams [issue #495](https://github.com/whatwg/streams/issues/495#issuecomment-2560361444)
 
