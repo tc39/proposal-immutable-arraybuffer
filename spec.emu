@@ -504,9 +504,9 @@ contributors: Mark S. Miller, Richard Gibson
         </dl>
         <emu-alg>
           1. Assert: IsSharedArrayBuffer(_arrayBuffer_) is *false*.
+          1. <ins>If IsImmutableBuffer(_arrayBuffer_) is *true*, throw a *TypeError* exception.</ins>
           1. If _key_ is not present, set _key_ to *undefined*.
           1. If _arrayBuffer_.[[ArrayBufferDetachKey]] is not _key_, throw a *TypeError* exception.
-          1. <ins>If IsImmutableBuffer(_arrayBuffer_) is *true*, throw a *TypeError* exception.</ins>
           1. Set _arrayBuffer_.[[ArrayBufferData]] to *null*.
           1. Set _arrayBuffer_.[[ArrayBufferByteLength]] to 0.
           1. Return ~unused~.
