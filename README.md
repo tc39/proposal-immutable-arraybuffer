@@ -59,7 +59,7 @@ w3c TPAC talk [Zero-copy operations on the web](https://www.w3.org/2020/Talks/TP
 
 web-bluetooth [read-only ArrayBuffer](https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer), especially [issue #300](https://github.com/WebBluetoothCG/web-bluetooth/issues/300#issuecomment-2560251857)
 
-gpuweb [issue #2072](https://github.com/gpuweb/gpuweb/issues/2072#issuecomment-2560291036), [issue #747](https://github.com/gpuweb/gpuweb/issues/747#issuecomment-2560254816), and [SharedValueTable proposal](https://hackmd.io/@webgpu/S1f56dN8s) -- [likely should use](https://github.com/tc39/proposal-immutable-arraybuffer/issues/25) [[Limited ArrayBuffer](https://github.com/tc39/proposal-limited-arraybuffer) instead of Immutable ArrayBuffer.
+gpuweb [issue #2072](https://github.com/gpuweb/gpuweb/issues/2072#issuecomment-2560291036), [issue #747](https://github.com/gpuweb/gpuweb/issues/747#issuecomment-2560254816), and [SharedValueTable proposal](https://hackmd.io/@webgpu/S1f56dN8s) -- [likely should use](https://github.com/tc39/proposal-immutable-arraybuffer/issues/25) [Limited ArrayBuffer](https://github.com/tc39/proposal-limited-arraybuffer) instead of Immutable ArrayBuffer.
 
 webidl [Frozen Array](https://webidl.spec.whatwg.org/#idl-frozen-array)
 
