@@ -60,14 +60,16 @@ w3c TPAC talk [Zero-copy operations on the web](https://www.w3.org/2020/Talks/TP
 web-bluetooth [read-only ArrayBuffer](https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer), especially [issue #300](https://github.com/WebBluetoothCG/web-bluetooth/issues/300#issuecomment-2560251857)
 
 gpuweb [issue #2072](https://github.com/gpuweb/gpuweb/issues/2072#issuecomment-2560291036), [issue #747](https://github.com/gpuweb/gpuweb/issues/747#issuecomment-2560254816), and [SharedValueTable proposal](https://hackmd.io/@webgpu/S1f56dN8s) 
-  - [likely should use](https://github.com/tc39/proposal-immutable-arraybuffer/issues/25) [Limited ArrayBuffer](https://github.com/tc39/proposal-limited-arraybuffer) instead of Immutable ArrayBuffer because Immutable ArrayBuffers cannot be detached. Note that [`WebAssembly.Memory` also can't be detached (except via other WebAssembly methods,...)](https://github.com/tc39/proposal-immutable-arraybuffer/issues/20#issuecomment-2562075230).
+  - [likely should use](https://github.com/tc39/proposal-immutable-arraybuffer/issues/25) [Limited ArrayBuffer](https://github.com/tc39/proposal-limited-arraybuffer) instead of Immutable ArrayBuffer because Immutable ArrayBuffers cannot be detached.
+  - Note that [`WebAssembly.Memory` also can't be detached (except via other WebAssembly methods,...)](https://github.com/tc39/proposal-immutable-arraybuffer/issues/20#issuecomment-2562075230).
 
 webidl [Frozen Array](https://webidl.spec.whatwg.org/#idl-frozen-array)
 
 webcodecs [issue #80](https://github.com/w3c/webcodecs/issues/80#issuecomment-2560331900), [issue #104](https://github.com/w3c/webcodecs/issues/104#issuecomment-2560334782), and [issue #212](https://github.com/w3c/webcodecs/issues/212#issuecomment-2560348504)
 
 web transport [issue #131](https://github.com/w3c/webtransport/issues/131#issuecomment-2560357416) 
-  - [unlikely](https://github.com/w3c/webtransport/issues/131#issuecomment-2662013436) because Chrome (and likely others) copy when crossing address spaces. But see [Even when talking between different processes, each with their own address space, for a huge enough buffer ...](https://github.com/tc39/proposal-immutable-arraybuffer/issues/30#issuecomment-2652223749)
+  - [unlikely](https://github.com/w3c/webtransport/issues/131#issuecomment-2662013436) because Chrome (and likely others) copy when crossing address spaces.
+  - But possible: see [Even when talking between different processes, each with their own address space, for a huge enough buffer ...](https://github.com/tc39/proposal-immutable-arraybuffer/issues/30#issuecomment-2652223749)
 
 whatwg streams [issue #495](https://github.com/whatwg/streams/issues/495#issuecomment-2560361444)
   - [unlikely](https://github.com/whatwg/streams/issues/495#issuecomment-2662375750) because, well, they are streams, not buffers.
