@@ -65,7 +65,7 @@ webidl [Frozen Array](https://webidl.spec.whatwg.org/#idl-frozen-array)
 
 webcodecs [issue #80](https://github.com/w3c/webcodecs/issues/80#issuecomment-2560331900), [issue #104](https://github.com/w3c/webcodecs/issues/104#issuecomment-2560334782), and [issue #212](https://github.com/w3c/webcodecs/issues/212#issuecomment-2560348504)
 
-web transport [issue #131](https://github.com/w3c/webtransport/issues/131#issuecomment-2560357416)
+web transport [issue #131](https://github.com/w3c/webtransport/issues/131#issuecomment-2560357416) [no](https://github.com/w3c/webtransport/issues/131#issuecomment-2561160533)
 
 whatwg streams [issue #495](https://github.com/whatwg/streams/issues/495#issuecomment-2560361444)
 
