@@ -85,6 +85,8 @@ An immutable buffer cannot be detached, resized, or further transferred. Its `ma
 
 The ArrayBuffer `slice` method and TypedArray methods that create new ArrayBuffers (`filter`, `map`, `slice`, `toReversed`, etc.) make no effort to preserve immutability, just like they make no effort to preserve resizability (although use of SpeciesConstructor in those methods means that _lack_ of resizability/immutability in the result cannot be guaranteed for the latter).
 
+Immutable buffers also [intuitively integrate with HTML `structuredClone`](https://github.com/whatwg/html/pull/11033)—they are not transferable, but cloning preserves both immutability and the underlying data block.
+
 ## Use cases
 
 ### Represent arbitrary binary data as an immutable [netstring](https://en.wikipedia.org/wiki/Netstring)
