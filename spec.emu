@@ -712,7 +712,7 @@ contributors: Mark S. Miller, Richard Gibson
 
     <emu-clause id="sec-properties-of-the-arraybuffer-instances" number="7">
       <h1>Properties of ArrayBuffer Instances</h1>
-      <p>ArrayBuffer instances inherit properties from the ArrayBuffer prototype object. ArrayBuffer instances each have an [[ArrayBufferData]] internal slot, an [[ArrayBufferByteLength]] internal slot, and an [[ArrayBufferDetachKey]] internal slot. ArrayBuffer instances which are resizable each have an [[ArrayBufferMaxByteLength]] internal slot<ins>, and ArrayBuffer instances which are immutable each have an [[ArrayBufferIsImmutable]] internal slot</ins>.</p>
+      <p>ArrayBuffer instances inherit properties from the ArrayBuffer prototype object. ArrayBuffer instances each have an [[ArrayBufferData]] internal slot, an [[ArrayBufferByteLength]] internal slot, and an [[ArrayBufferDetachKey]] internal slot. ArrayBuffer instances which are resizable each have an [[ArrayBufferMaxByteLength]] internal slot<ins>, and ArrayBuffer instances which are immutable each have an [[ArrayBufferIsImmutable]] internal slot whose value is always *undefined*</ins>.</p>
       <p>ArrayBuffer instances whose [[ArrayBufferData]] is *null* are considered to be detached and all operators to access or modify data contained in the ArrayBuffer instance will fail.</p>
       <p>ArrayBuffer instances whose [[ArrayBufferDetachKey]] is set to a value other than *undefined* need to have all DetachArrayBuffer calls passing that same "detach key" as an argument, otherwise a TypeError will result. This internal slot is only ever set by certain embedding environments, not by algorithms in this specification.</p>
     </emu-clause>
