@@ -416,7 +416,7 @@ contributors: Mark S. Miller, Richard Gibson
           </h1>
           <dl class="header">
             <dt>description</dt>
-            <dd>It is used to create an immutable ArrayBuffer (i.e., an ArrayBuffer with a an [[ArrayBufferIsImmutable]] slot) with contents from _fromBlock_.</dd>
+            <dd>It is used to create an immutable ArrayBuffer (i.e., an ArrayBuffer with a an [[ArrayBufferIsImmutable]] slot) with contents from _fromBlock_. The contents of an immutable ArrayBuffer's Data Block are constrained to be permanently stable, and may not be modified by either ECMAScript code or by other activities inside an implementation or observable by it.</dd>
           </dl>
           <emu-alg>
             1. Assert: _constructor_ is %ArrayBuffer%.
