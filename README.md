@@ -79,11 +79,14 @@ w3c machine learning workshop [issue #93](https://github.com/w3c/machine-learnin
 
 ## Solution
 
-This proposal introduces additional methods and read-only accessor properties to `ArrayBuffer.prototype` that fit naturally into those explained above. Just as a buffer can be resizable or not, and detached or not, this proposal enables buffers to be immutable or not. Just as `transferToFixedSize` moves the contents of a original buffer into a newly created non-resizable buffer, this proposal provides a transfer operation that moves the contents of an original original buffer into a newly created immutable buffer. Altogether, this proposal only adds to `ArrayBuffer.prototype` one method
-- `transferToImmutable(newByteLength?: number) :ArrayBuffer` -- move the contents of the original buffer into a new immutable buffer, detach the original buffer, and return the new buffer.
+This proposal introduces additional methods and read-only accessor properties to `ArrayBuffer.prototype` that fit naturally into those explained above. Just as a buffer can be resizable or not, and detached or not, this proposal enables buffers to be immutable or not. Just as `transferToFixedSize` moves the contents of a original buffer into a newly created non-resizable buffer, this proposal provides a transfer operation that moves the contents of an original original buffer into a newly created immutable buffer. Altogether, this proposal only adds to `ArrayBuffer.prototype` one read-only accessor
 
-and one read-only accessor
 - `immutable: boolean` -- is this buffer immutable, or can its contents be changed?
+
+and two methods
+
+- `transferToImmutable(newByteLength?: number) :ArrayBuffer` -- move the contents of the original buffer into a new immutable buffer, detach the original buffer, and return the new buffer.
+- `sliceToImmutable(start?: number, end?: number) :ArrayBuffer` -- create a new immutable buffer from a range of the original buffer's contents in a way that allows implementations to easily minimize and sometimes even eliminate copying them.
 
 An immutable buffer cannot be detached, resized, or further transferred. Its `maxByteLength` is the same as its `byteLength`. A `DataView` or `TypedArray` using an immutable buffer as its backing store can be frozen and immutable. `ArrayBuffer`s, `DataView`s, and `TypedArray`s that are frozen and immutable could be placed in ROM without going beyond JavaScript's official semantics.
 
