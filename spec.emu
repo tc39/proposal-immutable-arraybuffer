@@ -262,6 +262,58 @@ contributors: Mark S. Miller, Richard Gibson
         </emu-alg>
       </emu-clause>
 
+      <emu-clause id="sec-%typedarray%.prototype.filter" number="10">
+        <h1>%TypedArray%.prototype.filter ( _callback_ [ , _thisArg_ ] )</h1>
+        <p>The interpretation and use of the arguments of this method are the same as for `Array.prototype.filter` as defined in <emu-xref href="#sec-array.prototype.filter"></emu-xref>.</p>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be the *this* value.
+          1. Let _taRecord_ be ? ValidateTypedArray(_O_, ~seq-cst~).
+          1. Let _len_ be TypedArrayLength(_taRecord_).
+          1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
+          1. Let _kept_ be a new empty List.
+          1. Let _captured_ be 0.
+          1. Let _k_ be 0.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _kValue_ be ! Get(_O_, _Pk_).
+            1. Let _selected_ be ToBoolean(? Call(_callback_, _thisArg_, « _kValue_, 𝔽(_k_), _O_ »)).
+            1. If _selected_ is *true*, then
+              1. Append _kValue_ to _kept_.
+              1. Set _captured_ to _captured_ + 1.
+            1. Set _k_ to _k_ + 1.
+          1. Let _A_ be ? TypedArraySpeciesCreate(_O_, « 𝔽(_captured_) »<ins>, ~write~</ins>).
+          1. Let _n_ be 0.
+          1. For each element _e_ of _kept_, do
+            1. Perform <del>!</del><ins>?</ins> Set(_A_, ! ToString(𝔽(_n_)), _e_, *true*).
+            1. Set _n_ to _n_ + 1.
+          1. Return _A_.
+        </emu-alg>
+        <p>This method is not generic. The *this* value must be an object with a [[TypedArrayName]] internal slot.</p>
+      </emu-clause>
+
+      <emu-clause id="sec-%typedarray%.prototype.map" number="22">
+        <h1>%TypedArray%.prototype.map ( _callback_ [ , _thisArg_ ] )</h1>
+        <p>The interpretation and use of the arguments of this method are the same as for `Array.prototype.map` as defined in <emu-xref href="#sec-array.prototype.map"></emu-xref>.</p>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be the *this* value.
+          1. Let _taRecord_ be ? ValidateTypedArray(_O_, ~seq-cst~).
+          1. Let _len_ be TypedArrayLength(_taRecord_).
+          1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
+          1. Let _A_ be ? TypedArraySpeciesCreate(_O_, « 𝔽(_len_) »<ins>, ~write~</ins>).
+          1. Let _k_ be 0.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _kValue_ be ! Get(_O_, _Pk_).
+            1. Let _mappedValue_ be ? Call(_callback_, _thisArg_, « _kValue_, 𝔽(_k_), _O_ »).
+            1. Perform ? Set(_A_, _Pk_, _mappedValue_, *true*).
+            1. Set _k_ to _k_ + 1.
+          1. Return _A_.
+        </emu-alg>
+        <p>This method is not generic. The *this* value must be an object with a [[TypedArrayName]] internal slot.</p>
+      </emu-clause>
+
       <emu-clause id="sec-%typedarray%.prototype.reverse" number="25">
         <h1>%TypedArray%.prototype.reverse ( )</h1>
         <p>The interpretation and use of the arguments of this method are the same as for `Array.prototype.reverse` as defined in <emu-xref href="#sec-array.prototype.reverse"></emu-xref>.</p>
@@ -307,6 +359,59 @@ contributors: Mark S. Miller, Richard Gibson
         <p>This method is not generic. The *this* value must be an object with a [[TypedArrayName]] internal slot.</p>
       </emu-clause>
 
+      <emu-clause id="sec-%typedarray%.prototype.slice" number="27">
+        <h1>%TypedArray%.prototype.slice ( _start_, _end_ )</h1>
+        <p>The interpretation and use of the arguments of this method are the same as for `Array.prototype.slice` as defined in <emu-xref href="#sec-array.prototype.slice"></emu-xref>.</p>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _O_ be the *this* value.
+          1. Let _taRecord_ be ? ValidateTypedArray(_O_, ~seq-cst~).
+          1. Let _srcArrayLength_ be TypedArrayLength(_taRecord_).
+          1. Let _relativeStart_ be ? ToIntegerOrInfinity(_start_).
+          1. If _relativeStart_ = -∞, let _startIndex_ be 0.
+          1. Else if _relativeStart_ &lt; 0, let _startIndex_ be max(_srcArrayLength_ + _relativeStart_, 0).
+          1. Else, let _startIndex_ be min(_relativeStart_, _srcArrayLength_).
+          1. If _end_ is *undefined*, let _relativeEnd_ be _srcArrayLength_; else let _relativeEnd_ be ? ToIntegerOrInfinity(_end_).
+          1. If _relativeEnd_ = -∞, let _endIndex_ be 0.
+          1. Else if _relativeEnd_ &lt; 0, let _endIndex_ be max(_srcArrayLength_ + _relativeEnd_, 0).
+          1. Else, let _endIndex_ be min(_relativeEnd_, _srcArrayLength_).
+          1. Let _countBytes_ be max(_endIndex_ - _startIndex_, 0).
+          1. Let _A_ be ? TypedArraySpeciesCreate(_O_, « 𝔽(_countBytes_) »<ins>, ~write~</ins>).
+          1. If _countBytes_ > 0, then
+            1. Set _taRecord_ to MakeTypedArrayWithBufferWitnessRecord(_O_, ~seq-cst~).
+            1. If IsTypedArrayOutOfBounds(_taRecord_) is *true*, throw a *TypeError* exception.
+            1. Set _endIndex_ to min(_endIndex_, TypedArrayLength(_taRecord_)).
+            1. Set _countBytes_ to max(_endIndex_ - _startIndex_, 0).
+            1. Let _srcType_ be TypedArrayElementType(_O_).
+            1. Let _targetType_ be TypedArrayElementType(_A_).
+            1. If _srcType_ is _targetType_, then
+              1. NOTE: The transfer must be performed in a manner that preserves the bit-level encoding of the source data.
+              1. Let _srcBuffer_ be _O_.[[ViewedArrayBuffer]].
+              1. Let _targetBuffer_ be _A_.[[ViewedArrayBuffer]].
+              1. Let _elementSize_ be TypedArrayElementSize(_O_).
+              1. Let _srcByteOffset_ be _O_.[[ByteOffset]].
+              1. Let _srcByteIndex_ be (_startIndex_ × _elementSize_) + _srcByteOffset_.
+              1. Let _targetByteIndex_ be _A_.[[ByteOffset]].
+              1. Let _endByteIndex_ be _targetByteIndex_ + (_countBytes_ × _elementSize_).
+              1. Repeat, while _targetByteIndex_ &lt; _endByteIndex_,
+                1. Let _value_ be GetValueFromBuffer(_srcBuffer_, _srcByteIndex_, ~uint8~, *true*, ~unordered~).
+                1. Perform SetValueInBuffer(_targetBuffer_, _targetByteIndex_, ~uint8~, _value_, *true*, ~unordered~).
+                1. Set _srcByteIndex_ to _srcByteIndex_ + 1.
+                1. Set _targetByteIndex_ to _targetByteIndex_ + 1.
+            1. Else,
+              1. Let _n_ be 0.
+              1. Let _k_ be _startIndex_.
+              1. Repeat, while _k_ &lt; _endIndex_,
+                1. Let _Pk_ be ! ToString(𝔽(_k_)).
+                1. Let _kValue_ be ! Get(_O_, _Pk_).
+                1. Perform <del>!</del><ins>?</ins> Set(_A_, ! ToString(𝔽(_n_)), _kValue_, *true*).
+                1. Set _k_ to _k_ + 1.
+                1. Set _n_ to _n_ + 1.
+          1. Return _A_.
+        </emu-alg>
+        <p>This method is not generic. The *this* value must be an object with a [[TypedArrayName]] internal slot.</p>
+      </emu-clause>
+
       <emu-clause id="sec-%typedarray%.prototype.sort" oldids="sec-typedarraysortcompare" number="29">
         <h1>%TypedArray%.prototype.sort ( _comparator_ )</h1>
         <p>This is a distinct method that, except as described below, implements the same requirements as those of `Array.prototype.sort` as defined in <emu-xref href="#sec-array.prototype.sort"></emu-xref>. The implementation of this method may be optimized with the knowledge that the *this* value is an object that has a fixed length and whose integer-indexed properties are not sparse.</p>
@@ -335,6 +440,31 @@ contributors: Mark S. Miller, Richard Gibson
 
     <emu-clause id="sec-abstract-operations-for-typedarray-objects" number="4">
       <h1>Abstract Operations for TypedArray Objects</h1>
+
+      <emu-clause id="typedarray-species-create" type="abstract operation" number="1">
+        <h1>
+          TypedArraySpeciesCreate (
+            _exemplar_: a TypedArray,
+            _argumentList_: a List of ECMAScript language values,
+            <ins>optional _accessMode_: ~read~ or ~write~,</ins>
+          ): either a normal completion containing a TypedArray or a throw completion
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd>It is used to specify the creation of a new TypedArray using a constructor function that is derived from _exemplar_. Unlike ArraySpeciesCreate, which can create non-Array objects through the use of %Symbol.species%, this operation enforces that the constructor function creates an actual TypedArray.</dd>
+        </dl>
+        <emu-alg>
+          1. <ins>If _accessMode_ is not present, set _accessMode_ to ~read~.</ins>
+          1. Let _defaultConstructor_ be the intrinsic object associated with the constructor name _exemplar_.[[TypedArrayName]] in <emu-xref href="#table-the-typedarray-constructors"></emu-xref>.
+          1. Let _constructor_ be ? SpeciesConstructor(_exemplar_, _defaultConstructor_).
+          1. Let _result_ be ? TypedArrayCreateFromConstructor(_constructor_, _argumentList_).
+          1. <del>Assert: _result_ has [[TypedArrayName]] and [[ContentType]] internal slots.</del>
+          1. <ins>Assert: _result_ has all of the internal slots of a <var>TypedArray</var> instance (<emu-xref href="#sec-properties-of-typedarray-instances"></emu-xref>).</ins>
+          1. If _result_.[[ContentType]] is not _exemplar_.[[ContentType]], throw a *TypeError* exception.
+          1. <ins>If _accessMode_ is ~write~ and IsImmutableBuffer(_result_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
+          1. Return _result_.
+        </emu-alg>
+      </emu-clause>
 
       <emu-clause id="sec-validatetypedarray" type="abstract operation" number="4">
         <h1>
