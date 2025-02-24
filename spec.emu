@@ -176,6 +176,81 @@ contributors: Mark S. Miller, Richard Gibson
   <emu-clause id="sec-typedarray-objects" number="2">
     <h1>TypedArray Objects</h1>
 
+    <emu-clause id="sec-properties-of-the-%typedarray%-intrinsic-object" number="2">
+      <h1>Properties of the %TypedArray% Intrinsic Object</h1>
+      <p>The %TypedArray% intrinsic object:</p>
+      <ul>
+        <li>has a [[Prototype]] internal slot whose value is %Function.prototype%.</li>
+        <li>has a *"name"* property whose value is *"TypedArray"*.</li>
+        <li>has the following properties:</li>
+      </ul>
+
+      <emu-clause id="sec-%typedarray%.from">
+        <h1>%TypedArray%.from ( _source_ [ , _mapper_ [ , _thisArg_ ] ] )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _C_ be the *this* value.
+          1. If IsConstructor(_C_) is *false*, throw a *TypeError* exception.
+          1. If _mapper_ is *undefined*, then
+            1. Let _mapping_ be *false*.
+          1. Else,
+            1. If IsCallable(_mapper_) is *false*, throw a *TypeError* exception.
+            1. Let _mapping_ be *true*.
+          1. Let _usingIterator_ be ? GetMethod(_source_, %Symbol.iterator%).
+          1. If _usingIterator_ is not *undefined*, then
+            1. Let _values_ be ? IteratorToList(? GetIteratorFromMethod(_source_, _usingIterator_)).
+            1. Let _len_ be the number of elements in _values_.
+            1. Let _targetObj_ be ? TypedArrayCreateFromConstructor(_C_, « 𝔽(_len_) »<ins>, ~write~</ins>).
+            1. Let _k_ be 0.
+            1. Repeat, while _k_ &lt; _len_,
+              1. Let _Pk_ be ! ToString(𝔽(_k_)).
+              1. Let _kValue_ be the first element of _values_.
+              1. Remove the first element from _values_.
+              1. If _mapping_ is *true*, then
+                1. Let _mappedValue_ be ? Call(_mapper_, _thisArg_, « _kValue_, 𝔽(_k_) »).
+              1. Else,
+                1. Let _mappedValue_ be _kValue_.
+              1. Perform ? Set(_targetObj_, _Pk_, _mappedValue_, *true*).
+              1. Set _k_ to _k_ + 1.
+            1. Assert: _values_ is now an empty List.
+            1. Return _targetObj_.
+          1. NOTE: _source_ is not an iterable object, so assume it is already an array-like object.
+          1. Let _arrayLike_ be ! ToObject(_source_).
+          1. Let _len_ be ? LengthOfArrayLike(_arrayLike_).
+          1. Let _targetObj_ be ? TypedArrayCreateFromConstructor(_C_, « 𝔽(_len_) »<ins>, ~write~</ins>).
+          1. Let _k_ be 0.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Let _kValue_ be ? Get(_arrayLike_, _Pk_).
+            1. If _mapping_ is *true*, then
+              1. Let _mappedValue_ be ? Call(_mapper_, _thisArg_, « _kValue_, 𝔽(_k_) »).
+            1. Else,
+              1. Let _mappedValue_ be _kValue_.
+            1. Perform ? Set(_targetObj_, _Pk_, _mappedValue_, *true*).
+            1. Set _k_ to _k_ + 1.
+          1. Return _targetObj_.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-%typedarray%.of">
+        <h1>%TypedArray%.of ( ..._items_ )</h1>
+        <p>This method performs the following steps when called:</p>
+        <emu-alg>
+          1. Let _len_ be the number of elements in _items_.
+          1. Let _C_ be the *this* value.
+          1. If IsConstructor(_C_) is *false*, throw a *TypeError* exception.
+          1. Let _newObj_ be ? TypedArrayCreateFromConstructor(_C_, « 𝔽(_len_) »<ins>, ~write~</ins>).
+          1. Let _k_ be 0.
+          1. Repeat, while _k_ &lt; _len_,
+            1. Let _kValue_ be _items_[_k_].
+            1. Let _Pk_ be ! ToString(𝔽(_k_)).
+            1. Perform ? Set(_newObj_, _Pk_, _kValue_, *true*).
+            1. Set _k_ to _k_ + 1.
+          1. Return _newObj_.
+        </emu-alg>
+      </emu-clause>
+    </emu-clause>
+
     <emu-clause id="sec-properties-of-the-%typedarrayprototype%-object" number="3">
       <h1>Properties of the %TypedArray% Prototype Object</h1>
 
@@ -457,12 +532,35 @@ contributors: Mark S. Miller, Richard Gibson
           1. <ins>If _accessMode_ is not present, set _accessMode_ to ~read~.</ins>
           1. Let _defaultConstructor_ be the intrinsic object associated with the constructor name _exemplar_.[[TypedArrayName]] in <emu-xref href="#table-the-typedarray-constructors"></emu-xref>.
           1. Let _constructor_ be ? SpeciesConstructor(_exemplar_, _defaultConstructor_).
-          1. Let _result_ be ? TypedArrayCreateFromConstructor(_constructor_, _argumentList_).
+          1. Let _result_ be ? TypedArrayCreateFromConstructor(_constructor_, _argumentList_<ins>, _accessMode_</ins>).
           1. <del>Assert: _result_ has [[TypedArrayName]] and [[ContentType]] internal slots.</del>
           1. <ins>Assert: _result_ has all of the internal slots of a <var>TypedArray</var> instance (<emu-xref href="#sec-properties-of-typedarray-instances"></emu-xref>).</ins>
           1. If _result_.[[ContentType]] is not _exemplar_.[[ContentType]], throw a *TypeError* exception.
-          1. <ins>If _accessMode_ is ~write~ and IsImmutableBuffer(_result_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
           1. Return _result_.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-typedarraycreatefromconstructor" oldids="typedarray-create" type="abstract operation">
+        <h1>
+          TypedArrayCreateFromConstructor (
+            _constructor_: a constructor,
+            _argumentList_: a List of ECMAScript language values,
+            <ins>optional _accessMode_: ~read~ or ~write~,</ins>
+          ): either a normal completion containing a TypedArray or a throw completion
+        </h1>
+        <dl class="header">
+          <dt>description</dt>
+          <dd>It is used to specify the creation of a new TypedArray using a constructor function.</dd>
+        </dl>
+        <emu-alg>
+          1. <ins>If _accessMode_ is not present, set _accessMode_ to ~read~.</ins>
+          1. Let _newTypedArray_ be ? Construct(_constructor_, _argumentList_).
+          1. Let _taRecord_ be ? ValidateTypedArray(_newTypedArray_, ~seq-cst~<ins>, _accessMode_</ins>).
+          1. If the number of elements in _argumentList_ is 1 and _argumentList_[0] is a Number, then
+            1. If IsTypedArrayOutOfBounds(_taRecord_) is *true*, throw a *TypeError* exception.
+            1. Let _length_ be TypedArrayLength(_taRecord_).
+            1. If _length_ &lt; ℝ(_argumentList_[0]), throw a *TypeError* exception.
+          1. Return _newTypedArray_.
         </emu-alg>
       </emu-clause>
 
