@@ -360,7 +360,7 @@ contributors: Mark S. Miller, Richard Gibson
           1. Let _A_ be ? TypedArraySpeciesCreate(_O_, « 𝔽(_captured_) »<ins>, ~write~</ins>).
           1. Let _n_ be 0.
           1. For each element _e_ of _kept_, do
-            1. Perform <del>!</del><ins>?</ins> Set(_A_, ! ToString(𝔽(_n_)), _e_, *true*).
+            1. Perform ! Set(_A_, ! ToString(𝔽(_n_)), _e_, *true*).
             1. Set _n_ to _n_ + 1.
           1. Return _A_.
         </emu-alg>
@@ -479,7 +479,7 @@ contributors: Mark S. Miller, Richard Gibson
               1. Repeat, while _k_ &lt; _endIndex_,
                 1. Let _Pk_ be ! ToString(𝔽(_k_)).
                 1. Let _kValue_ be ! Get(_O_, _Pk_).
-                1. Perform <del>!</del><ins>?</ins> Set(_A_, ! ToString(𝔽(_n_)), _kValue_, *true*).
+                1. Perform ! Set(_A_, ! ToString(𝔽(_n_)), _kValue_, *true*).
                 1. Set _k_ to _k_ + 1.
                 1. Set _n_ to _n_ + 1.
           1. Return _A_.
