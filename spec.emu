@@ -358,6 +358,7 @@ contributors: Mark S. Miller, Richard Gibson
               1. Set _captured_ to _captured_ + 1.
             1. Set _k_ to _k_ + 1.
           1. Let _A_ be ? TypedArraySpeciesCreate(_O_, « 𝔽(_captured_) »<ins>, ~write~</ins>).
+          1. <ins>Assert: IsImmutableBuffer(_A_.[[ViewedArrayBuffer]]) is *false*.</ins>
           1. Let _n_ be 0.
           1. For each element _e_ of _kept_, do
             1. Perform ! Set(_A_, ! ToString(𝔽(_n_)), _e_, *true*).
@@ -377,6 +378,7 @@ contributors: Mark S. Miller, Richard Gibson
           1. Let _len_ be TypedArrayLength(_taRecord_).
           1. If IsCallable(_callback_) is *false*, throw a *TypeError* exception.
           1. Let _A_ be ? TypedArraySpeciesCreate(_O_, « 𝔽(_len_) »<ins>, ~write~</ins>).
+          1. <ins>Assert: IsImmutableBuffer(_A_.[[ViewedArrayBuffer]]) is *false*.</ins>
           1. Let _k_ be 0.
           1. Repeat, while _k_ &lt; _len_,
             1. Let _Pk_ be ! ToString(𝔽(_k_)).
@@ -452,6 +454,7 @@ contributors: Mark S. Miller, Richard Gibson
           1. Else, let _endIndex_ be min(_relativeEnd_, _srcArrayLength_).
           1. Let _countBytes_ be max(_endIndex_ - _startIndex_, 0).
           1. Let _A_ be ? TypedArraySpeciesCreate(_O_, « 𝔽(_countBytes_) »<ins>, ~write~</ins>).
+          1. <ins>Assert: IsImmutableBuffer(_A_.[[ViewedArrayBuffer]]) is *false*.</ins>
           1. If _countBytes_ > 0, then
             1. Set _taRecord_ to MakeTypedArrayWithBufferWitnessRecord(_O_, ~seq-cst~).
             1. If IsTypedArrayOutOfBounds(_taRecord_) is *true*, throw a *TypeError* exception.
