@@ -21,6 +21,7 @@ A TC39 proposal for immutable ArrayBuffers.
 - ***for stage 1*** - October 2024 tc39 plenary ([slides.key](./immu-arraybuffer-talks/immu-arrayBuffers-stage1-as-recorded.key), [slides.pdf](./immu-arraybuffer-talks/immu-arrayBuffers-stage1.pdf), [video](https://www.youtube.com/watch?v=CP_5Yo9h84k))
 - ***for stage 2*** - December 2024 tc39 plenary ([slides.key](./immu-arraybuffer-talks/immu-arrayBuffers-stage2.key), [slides.pdf](./immu-arraybuffer-talks/immu-arrayBuffers-stage2.pdf), [docs slides](https://docs.google.com/presentation/d/1S1ixC7AVg3s_p4ZNhu3zBMcIcKbFkmp6umnsQUKOIqw/edit?usp=sharing), [video](https://www.youtube.com/watch?v=Fy_AnIbAAm8))
 - ***for stage 2.7*** - February 2025 plenary ([slides.key](./immu-arraybuffer-talks/immu-arrayBuffers-stage2-7-as-presented.key), [slides.pdf](./immu-arraybuffer-talks/immu-arrayBuffers-stage2-7-as-presented.pdf))
+- ***for stage 3*** - April 2025 Plenary ([slides.key](./immu-arraybuffer-talks/immu-arrayBuffers-stage3.key), [slides.pdf](./immu-arraybuffer-talks/immu-arrayBuffers-stage3.pdf))
 
 ## Background
 
@@ -135,10 +136,10 @@ assert(String.fromCharCode(...result) === '12:hello world!,');
 ### Native implementations
 
 Tracking issues to be added:
-- JavaScriptCore
-- SpiderMonkey
-- XS (implemented. need link)
-- V8
+- [ ] JavaScriptCore
+- [ ] SpiderMonkey
+- [x] XS
+- [ ] V8
 
 ## Q&A
 
