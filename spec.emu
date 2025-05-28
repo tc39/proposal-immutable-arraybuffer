@@ -845,7 +845,7 @@ contributors: Mark S. Miller, Richard Gibson
           1. If IsSharedArrayBuffer(_O_) is *true*, throw a *TypeError* exception.
           1. Let _newByteLength_ be ? ToIndex(_newLength_).
           1. If IsDetachedBuffer(_O_) is *true*, throw a *TypeError* exception.
-          1. <ins>If IsImmutableBuffer(_O_) is *true*, throw a *TypeError* exception.</ins>
+          1. <ins>Assert: IsImmutableBuffer(_O_) is *false*.</ins>
           1. If _newByteLength_ > _O_.[[ArrayBufferMaxByteLength]], throw a *RangeError* exception.
           1. Let _hostHandled_ be ? HostResizeArrayBuffer(_O_, _newByteLength_).
           1. If _hostHandled_ is ~handled~, return *undefined*.
