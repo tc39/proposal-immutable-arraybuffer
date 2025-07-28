@@ -55,7 +55,7 @@ The [OCapN](https://ocapn.org/) network protocol treats strings and byte-arrays 
 
 [Readonly Collections](https://github.com/tc39/proposal-readonly-collections), especially [issue #10](https://github.com/tc39/proposal-readonly-collections/issues/10)
 
-wasm [issue #1162](https://github.com/WebAssembly/design/issues/1162#issuecomment-2560354923)
+wasm zero copy [issue #1162 comment](https://github.com/WebAssembly/design/issues/1162#issuecomment-2666958705)
 
 w3c TPAC talk [Zero-copy operations on the web](https://www.w3.org/2020/Talks/TPAC/unconference/zerocopy.pdf)
 
@@ -77,6 +77,10 @@ whatwg streams [issue #495](https://github.com/whatwg/streams/issues/495#issueco
   - [unlikely](https://github.com/whatwg/streams/issues/495#issuecomment-2662375750) because, well, they are streams, not buffers.
 
 w3c machine learning workshop [issue #93](https://github.com/w3c/machine-learning-workshop/issues/93#issuecomment-2560365962)
+
+[Deno intends to support](https://deno.com/blog/updates-from-tc39#immutable-arraybuffer)
+
+[Proposal Import Buffer](https://github.com/styfle/proposal-import-buffer) relies on Immutable ArrayBuffer
 
 ## Solution
 
