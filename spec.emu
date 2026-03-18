@@ -590,6 +590,91 @@ markEffects: true
       </emu-clause>
     </emu-clause>
   </emu-clause>
+
+  <emu-clause id="sec-uint8array">
+    <h1>Uint8Array Objects</h1>
+
+    <emu-clause id="sec-additional-properties-of-the-uint8array-prototype-object" number="2">
+      <h1>Additional Properties of the Uint8Array Prototype Object</h1>
+
+      <emu-clause id="sec-uint8array.prototype.setfrombase64">
+        <h1>Uint8Array.prototype.setFromBase64 ( _string_ [ , _options_ ] )</h1>
+        <emu-alg>
+          1. Let _into_ be the *this* value.
+          1. Perform ? ValidateUint8Array(_into_<ins>, ~write~</ins>).
+          1. If _string_ is not a String, throw a *TypeError* exception.
+          1. Let _opts_ be ? GetOptionsObject(_options_).
+          1. Let _alphabet_ be ? Get(_opts_, *"alphabet"*).
+          1. If _alphabet_ is *undefined*, set _alphabet_ to *"base64"*.
+          1. If _alphabet_ is neither *"base64"* nor *"base64url"*, throw a *TypeError* exception.
+          1. Let _lastChunkHandling_ be ? Get(_opts_, *"lastChunkHandling"*).
+          1. If _lastChunkHandling_ is *undefined*, set _lastChunkHandling_ to *"loose"*.
+          1. If _lastChunkHandling_ is not one of *"loose"*, *"strict"*, or *"stop-before-partial"*, throw a *TypeError* exception.
+          1. Let _taRecord_ be MakeTypedArrayWithBufferWitnessRecord(_into_, ~seq-cst~).
+          1. If IsTypedArrayOutOfBounds(_taRecord_) is *true*, throw a *TypeError* exception.
+          1. Let _byteLength_ be TypedArrayLength(_taRecord_).
+          1. Let _result_ be FromBase64(_string_, _alphabet_, _lastChunkHandling_, _byteLength_).
+          1. Let _bytes_ be _result_.[[Bytes]].
+          1. Let _written_ be the number of elements in _bytes_.
+          1. NOTE: FromBase64 does not invoke any user code, so the ArrayBuffer backing _into_ cannot have been detached or shrunk.
+          1. Assert: _written_ ≤ _byteLength_.
+          1. Perform SetUint8ArrayBytes(_into_, _bytes_).
+          1. If _result_.[[Error]] is not ~none~, then
+            1. Return ThrowCompletion(_result_.[[Error]]).
+          1. Let _resultObject_ be OrdinaryObjectCreate(%Object.prototype%).
+          1. Perform ! CreateDataPropertyOrThrow(_resultObject_, *"read"*, 𝔽(_result_.[[Read]])).
+          1. Perform ! CreateDataPropertyOrThrow(_resultObject_, *"written"*, 𝔽(_written_)).
+          1. Return _resultObject_.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-uint8array.prototype.setfromhex">
+        <h1>Uint8Array.prototype.setFromHex ( _string_ )</h1>
+        <emu-alg>
+          1. Let _into_ be the *this* value.
+          1. Perform ? ValidateUint8Array(_into_<ins>, ~write~</ins>).
+          1. If _string_ is not a String, throw a *TypeError* exception.
+          1. Let _taRecord_ be MakeTypedArrayWithBufferWitnessRecord(_into_, ~seq-cst~).
+          1. If IsTypedArrayOutOfBounds(_taRecord_) is *true*, throw a *TypeError* exception.
+          1. Let _byteLength_ be TypedArrayLength(_taRecord_).
+          1. Let _result_ be FromHex(_string_, _byteLength_).
+          1. Let _bytes_ be _result_.[[Bytes]].
+          1. Let _written_ be the number of elements in _bytes_.
+          1. NOTE: FromHex does not invoke any user code, so the ArrayBuffer backing _into_ cannot have been detached or shrunk.
+          1. Assert: _written_ ≤ _byteLength_.
+          1. Perform SetUint8ArrayBytes(_into_, _bytes_).
+          1. If _result_.[[Error]] is not ~none~, then
+            1. Return ThrowCompletion(_result_.[[Error]]).
+          1. Let _resultObject_ be OrdinaryObjectCreate(%Object.prototype%).
+          1. Perform ! CreateDataPropertyOrThrow(_resultObject_, *"read"*, 𝔽(_result_.[[Read]])).
+          1. Perform ! CreateDataPropertyOrThrow(_resultObject_, *"written"*, 𝔽(_written_)).
+          1. Return _resultObject_.
+        </emu-alg>
+      </emu-clause>
+    </emu-clause>
+
+    <emu-clause id="sec-abstract-operations-for-uint8array-objects">
+      <h1>Abstract Operations for Uint8Array Objects</h1>
+
+      <emu-clause id="sec-validateuint8array" type="abstract operation">
+        <h1>
+          ValidateUint8Array (
+            _ta_: an ECMAScript language value,
+            <ins>optional _accessMode_: ~read~ or ~write~,</ins>
+          ): either a normal completion containing ~unused~ or a throw completion
+        </h1>
+        <dl class="header"></dl>
+        <emu-alg>
+          1. <ins>If _accessMode_ is not present, set _accessMode_ to ~read~.</ins>
+          1. Perform ? RequireInternalSlot(_ta_, [[TypedArrayName]]).
+          1. If _ta_.[[TypedArrayName]] is not *"Uint8Array"*, throw a *TypeError* exception.
+          1. <ins>Assert: _ta_ has a [[ViewedArrayBuffer]] internal slot.</ins>
+          1. <ins>If _accessMode_ is ~write~ and IsImmutableBuffer(_ta_.[[ViewedArrayBuffer]]) is *true*, throw a *TypeError* exception.</ins>
+          1. Return ~unused~.
+        </emu-alg>
+      </emu-clause>
+    </emu-clause>
+  </emu-clause>
 </emu-clause>
 
 <emu-clause id="sec-structured-data" number="25">
