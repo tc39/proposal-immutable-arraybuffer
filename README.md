@@ -140,10 +140,10 @@ assert(String.fromCharCode(...result) === '12:hello world!,');
 ### Native implementations
 
 Tracking issues to be added:
-- [ ] JavaScriptCore
-- [ ] SpiderMonkey
+- [ ] [JavaScriptCore](https://bugs.webkit.org/show_bug.cgi?id=321610)
+- [ ] [SpiderMonkey](https://bugzilla.mozilla.org/show_bug.cgi?id=1952253)
 - [x] XS
-- [ ] V8
+- [ ] [V8](https://issues.chromium.org/issues/450237486)
 
 ## Q&A
 
